@@ -101,6 +101,13 @@ const budgetSession = document.querySelector("[data-budget-session]");
 const budgetSessionStatus = document.querySelector("[data-budget-session-status]");
 const budgetSessionDetail = document.querySelector("[data-budget-session-detail]");
 const budgetSessionAction = document.querySelector("[data-budget-session-action]");
+const budgetDelivery = document.querySelector("[data-budget-delivery]");
+const budgetConsent = document.querySelector("[data-budget-consent]");
+const budgetProgress = document.querySelector("[data-budget-progress]");
+const budgetProgressLabel = document.querySelector("[data-budget-progress-label]");
+const budgetProgressValue = document.querySelector("[data-budget-progress-value]");
+const budgetProgressBar = document.querySelector("[data-budget-progress-bar]");
+const budgetProgressDetail = document.querySelector("[data-budget-progress-detail]");
 let serviceCards = [];
 const screenSections = [...document.querySelectorAll("[data-screen]")];
 const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -113,6 +120,9 @@ const BUDGET_PRINT_PRICES = {
   color: 200,
 };
 const BUDGET_BINDING_PRICE = 2500;
+const BUDGET_MAX_FILES = 6;
+const BUDGET_MAX_FILE_SIZE = 20 * 1024 * 1024;
+const BUDGET_MAX_ORDER_SIZE = 60 * 1024 * 1024;
 
 let ticking = false;
 let isScreenJumping = false;
@@ -129,6 +139,7 @@ let servicePreviewCloseTimer;
 let budgetDocuments = [];
 let isBudgetFocused = false;
 let isBudgetProcessing = false;
+let isBudgetSubmitting = false;
 let budgetFocusNoticeTimer;
 let budgetFocusReturnTarget;
 let budgetEntryArrivalTimer;
@@ -196,14 +207,6 @@ function normalizeBudgetAmount(value) {
 function getDocumentNotebookCount(documentItem) {
   const copies = normalizeBudgetAmount(documentItem.copies);
   return Math.min(normalizeBudgetAmount(documentItem.notebooks), copies);
-}
-
-function getBudgetModeLabel(mode) {
-  return mode === "color" ? "Color" : "Blanco y negro";
-}
-
-function getBudgetSidesLabel(sides) {
-  return sides === "doble" ? "Doble faz" : "Simple faz";
 }
 
 function getBudgetUnitPrice(mode) {
@@ -355,62 +358,30 @@ function refreshBudgetDocumentPreview(key) {
   });
 }
 
-function getBudgetMessage(totals = getBudgetTotals()) {
-  const documentLines = budgetDocuments.length
-    ? budgetDocuments.map((documentItem, index) => [
-      `PDF ${index + 1}: ${documentItem.name}`,
-      `Páginas: ${documentItem.pages || 0}`,
-      `Tipo: ${getBudgetModeLabel(documentItem.mode)}`,
-      `Caras: ${getBudgetSidesLabel(documentItem.sides)}`,
-      `Copias: ${normalizeBudgetAmount(documentItem.copies)}`,
-      `Hojas aprox.: ${getDocumentSheetCount(documentItem)}`,
-      documentItem.binding
-        ? `Anillado: sí, ${getDocumentNotebookCount(documentItem)} cuaderno(s)`
-        : "Anillado: no",
-      `Subtotal: ${formatBudgetCurrency(getDocumentTotal(documentItem))}`,
-    ].join("\n")).join("\n\n")
-    : "Documentos cargados: pendiente";
-
-  return [
-    "Hola Impresiones GG, quiero iniciar un presupuesto.",
-    documentLines,
-    `Total PDFs: ${budgetDocuments.length}`,
-    `Total páginas: ${totals.pages}`,
-    `Total hojas aprox.: ${totals.sheets}`,
-    `Subtotal impresión: ${formatBudgetCurrency(totals.printTotal)}`,
-    `Subtotal anillado: ${formatBudgetCurrency(totals.bindingTotal)}`,
-    `Presupuesto final estimado: ${formatBudgetCurrency(totals.total)}`,
-  ].join("\n");
+function getBudgetDraft() {
+  return {
+    documents: budgetDocuments.map((documentItem) => ({
+      name: documentItem.name,
+      size: documentItem.file?.size || 0,
+      pages: Math.max(0, Number.parseInt(documentItem.pages || "0", 10) || 0),
+      mode: documentItem.mode,
+      sides: documentItem.sides,
+      copies: normalizeBudgetAmount(documentItem.copies),
+      binding: documentItem.binding,
+      notebooks: documentItem.binding ? getDocumentNotebookCount(documentItem) : 0,
+    })),
+  };
 }
 
-function getBudgetFiles() {
-  return budgetDocuments
-    .map((documentItem) => documentItem.file)
-    .filter((file) => file instanceof File);
-}
-
-function canShareBudgetFiles(files = getBudgetFiles()) {
-  if (!files.length || typeof navigator.share !== "function" || typeof navigator.canShare !== "function") {
-    return false;
-  }
-
-  try {
-    return navigator.canShare({ files });
-  } catch {
-    return false;
-  }
-}
-
-function updateBudgetWhatsapp(totals) {
+function updateBudgetWhatsapp() {
   if (!budgetWhatsapp) return;
 
-  const message = getBudgetMessage(totals);
-  const canShareFiles = canShareBudgetFiles();
-
-  budgetWhatsapp.dataset.whatsappUrl = `https://wa.me/5492665050096?text=${encodeURIComponent(message)}`;
-  budgetWhatsapp.textContent = budgetDocuments.length
-    ? canShareFiles ? "Compartir presupuesto y PDFs" : "Continuar por WhatsApp"
-    : "Cargar primer PDF";
+  budgetWhatsapp.disabled = isBudgetSubmitting;
+  budgetWhatsapp.textContent = isBudgetSubmitting
+    ? "Guardando pedido..."
+    : budgetDocuments.length
+      ? "Crear pedido y abrir WhatsApp"
+      : "Cargar primer PDF";
 }
 
 function queueBudgetEntryHighlight() {
@@ -463,19 +434,24 @@ function updateBudgetSessionUI() {
   budgetSession.classList.toggle("is-paused", hasDocuments && !isBudgetFocused);
 
   if (budgetSessionStatus) {
-    budgetSessionStatus.textContent = isBudgetProcessing
+    budgetSessionStatus.textContent = isBudgetSubmitting
+      ? "Guardando pedido"
+      : isBudgetProcessing
       ? "Analizando PDFs"
       : isBudgetFocused ? "Presupuesto en curso" : "Presupuesto pausado";
   }
 
   if (budgetSessionDetail) {
-    budgetSessionDetail.textContent = isBudgetProcessing && !hasDocuments
+    budgetSessionDetail.textContent = isBudgetSubmitting
+      ? "No cierres esta pantalla"
+      : isBudgetProcessing && !hasDocuments
       ? "Preparando tus archivos"
       : `${budgetDocuments.length} PDF${budgetDocuments.length === 1 ? "" : "s"} cargado${budgetDocuments.length === 1 ? "" : "s"}`;
   }
 
   if (budgetSessionAction) {
-    budgetSessionAction.textContent = isBudgetFocused ? "Salir" : "Continuar";
+    budgetSessionAction.disabled = isBudgetSubmitting;
+    budgetSessionAction.textContent = isBudgetSubmitting ? "Guardando" : isBudgetFocused ? "Salir" : "Continuar";
     budgetSessionAction.setAttribute(
       "aria-label",
       isBudgetFocused ? "Salir del modo presupuesto" : "Continuar el presupuesto"
@@ -571,10 +547,34 @@ async function addBudgetFiles(fileList) {
   }
 
   const existingKeys = new Set(budgetDocuments.map((documentItem) => documentItem.key));
-  const filesToAdd = pdfFiles.filter((file) => !existingKeys.has(getBudgetDocumentKey(file)));
+  const uniqueFiles = pdfFiles.filter((file) => !existingKeys.has(getBudgetDocumentKey(file)));
+  const sizedFiles = uniqueFiles.filter((file) => file.size <= BUDGET_MAX_FILE_SIZE);
+
+  if (uniqueFiles.length && !sizedFiles.length) {
+    if (budgetStatus) budgetStatus.textContent = "Cada PDF puede pesar hasta 20 MB. Elegí una versión más liviana.";
+    return;
+  }
+
+  const availableSlots = Math.max(0, BUDGET_MAX_FILES - budgetDocuments.length);
+  if (!availableSlots) {
+    if (budgetStatus) budgetStatus.textContent = `Podés incluir hasta ${BUDGET_MAX_FILES} PDFs por pedido.`;
+    return;
+  }
+
+  const currentSize = budgetDocuments.reduce((sum, documentItem) => sum + (documentItem.file?.size || 0), 0);
+  let selectedSize = 0;
+  const filesToAdd = sizedFiles.filter((file) => {
+    if (selectedSize + currentSize + file.size > BUDGET_MAX_ORDER_SIZE) return false;
+    selectedSize += file.size;
+    return true;
+  }).slice(0, availableSlots);
 
   if (!filesToAdd.length) {
-    if (budgetStatus) budgetStatus.textContent = "Esos PDFs ya estaban cargados en el presupuesto.";
+    if (budgetStatus) {
+      budgetStatus.textContent = uniqueFiles.length
+        ? "El pedido puede reunir hasta 60 MB. Quitá un PDF o reducí su tamaño."
+        : "Esos PDFs ya estaban cargados en el presupuesto.";
+    }
     return;
   }
 
@@ -596,6 +596,9 @@ async function addBudgetFiles(fileList) {
     })));
 
     budgetDocuments = [...budgetDocuments, ...nextDocuments];
+    if (budgetConsent) budgetConsent.checked = false;
+    if (budgetProgress) budgetProgress.hidden = true;
+    budgetDelivery?.classList.remove("is-consent-required");
     renderBudgetDocuments();
     window.requestAnimationFrame(() => {
       const newestDocument = budgetDocumentList?.lastElementChild;
@@ -606,12 +609,11 @@ async function addBudgetFiles(fileList) {
 
     const pageCount = getBudgetPageCount();
     if (budgetStatus) {
-      const deliveryMessage = canShareBudgetFiles()
-        ? "Al finalizar, compartí el detalle junto con los PDFs y elegí WhatsApp."
-        : "Al finalizar se abrirá WhatsApp con el detalle; desde el chat podrás adjuntar los PDFs.";
+      const skippedCount = incomingFiles.length - filesToAdd.length;
+      const prefix = skippedCount > 0 ? `Se agregaron ${filesToAdd.length} PDFs válidos. ` : "";
       budgetStatus.textContent = pageCount > 0
-        ? `${incomingFiles.length > pdfFiles.length ? "Solo se agregaron los PDFs válidos. " : ""}Presupuesto actualizado. ${deliveryMessage}`
-        : "No pudimos detectar páginas en esos PDFs. Podés quitarlos o consultarnos por WhatsApp.";
+        ? `${prefix}Presupuesto actualizado. Al finalizar crearemos el pedido privado y abriremos WhatsApp.`
+        : `${prefix}El servidor verificará las páginas al guardar el pedido.`;
     }
   } catch {
     if (budgetStatus) budgetStatus.textContent = "No pudimos leer uno de los PDFs. Probá con otro archivo o consultanos por WhatsApp.";
@@ -643,45 +645,147 @@ async function countPdfPages(file) {
   return detectPdfPagesFromText(text);
 }
 
+function setBudgetProgress(value, label, detail) {
+  const normalizedValue = Math.min(100, Math.max(0, Math.round(value)));
+  if (budgetProgress) budgetProgress.hidden = false;
+  if (budgetProgressBar) budgetProgressBar.value = normalizedValue;
+  if (budgetProgressValue) budgetProgressValue.textContent = `${normalizedValue}%`;
+  if (budgetProgressLabel) budgetProgressLabel.textContent = label;
+  if (budgetProgressDetail) budgetProgressDetail.textContent = detail;
+}
+
+function setBudgetSubmitting(active) {
+  isBudgetSubmitting = Boolean(active);
+  budgetForm?.classList.toggle("is-submitting", isBudgetSubmitting);
+  budgetForm?.setAttribute("aria-busy", String(isBudgetSubmitting));
+  budgetUpload?.toggleAttribute("inert", isBudgetSubmitting);
+  budgetDocumentList?.toggleAttribute("inert", isBudgetSubmitting);
+  if (budgetConsent) budgetConsent.disabled = isBudgetSubmitting;
+  updateBudgetWhatsapp();
+  updateBudgetSessionUI();
+}
+
+async function readBudgetApiResponse(response) {
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(payload?.message || "No pudimos comunicarnos con el servidor de pedidos.");
+  }
+  return payload;
+}
+
+function uploadBudgetPdf(uploadUrl, token, file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("PUT", uploadUrl);
+    request.responseType = "json";
+    request.setRequestHeader("Content-Type", "application/pdf");
+    request.setRequestHeader("X-Order-Token", token);
+
+    request.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) onProgress(event.loaded / event.total);
+    });
+
+    request.addEventListener("load", () => {
+      const payload = request.response || {};
+      if (request.status >= 200 && request.status < 300) {
+        resolve(payload);
+      } else {
+        reject(new Error(payload.message || `No pudimos guardar ${file.name}.`));
+      }
+    });
+    request.addEventListener("error", () => reject(new Error(`Se interrumpió la carga de ${file.name}.`)));
+    request.addEventListener("abort", () => reject(new Error(`Se canceló la carga de ${file.name}.`)));
+    request.send(file);
+  });
+}
+
+async function createAndUploadBudgetOrder() {
+  setBudgetProgress(2, "Creando pedido", "Preparando un espacio privado para tus archivos...");
+  const createResponse = await fetch("/api/presupuestos", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(getBudgetDraft()),
+  });
+  const order = await readBudgetApiResponse(createResponse);
+
+  if (!Array.isArray(order.documents) || order.documents.length !== budgetDocuments.length) {
+    throw new Error("El servidor no pudo relacionar todos los PDFs del pedido.");
+  }
+
+  for (let index = 0; index < order.documents.length; index += 1) {
+    const serverDocument = order.documents[index];
+    const localDocument = budgetDocuments[index];
+    const start = 5 + (index / order.documents.length) * 82;
+    const portion = 82 / order.documents.length;
+
+    const uploadResult = await uploadBudgetPdf(
+      serverDocument.uploadUrl,
+      order.token,
+      localDocument.file,
+      (fileProgress) => setBudgetProgress(
+        start + fileProgress * portion,
+        `Guardando PDF ${index + 1} de ${order.documents.length}`,
+        localDocument.name,
+      ),
+    );
+
+    if (Number.isInteger(uploadResult.pages) && uploadResult.pages > 0) {
+      localDocument.pages = uploadResult.pages;
+      refreshBudgetDocumentPreview(localDocument.key);
+      updateBudgetEstimate();
+    }
+  }
+
+  setBudgetProgress(92, "Verificando presupuesto", "Confirmando páginas, configuración y total final...");
+  const finalizeResponse = await fetch(`/api/presupuestos/${encodeURIComponent(order.orderId)}/finalizar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: order.token }),
+  });
+  return readBudgetApiResponse(finalizeResponse);
+}
+
 async function handleBudgetStart() {
+  if (isBudgetSubmitting) return;
+
   if (!budgetDocuments.length) {
     if (budgetStatus) budgetStatus.textContent = "Cargá al menos un PDF para iniciar el presupuesto.";
     budgetFile?.click();
     return;
   }
 
-  const totals = getBudgetTotals();
-  const message = getBudgetMessage(totals);
-  const files = getBudgetFiles();
+  if (!budgetConsent?.checked) {
+    budgetDelivery?.classList.remove("is-consent-required");
+    void budgetDelivery?.offsetWidth;
+    budgetDelivery?.classList.add("is-consent-required");
+    budgetConsent?.focus();
+    if (budgetStatus) budgetStatus.textContent = "Confirmá la carga temporal para poder crear el pedido privado.";
+    return;
+  }
 
-  if (canShareBudgetFiles(files)) {
-    try {
-      await navigator.share({
-        title: "Presupuesto de Impresiones GG",
-        text: message,
-        files,
-      });
-      if (budgetStatus) budgetStatus.textContent = "Presupuesto y PDFs enviados al menú de compartir.";
-      setBudgetFocus(false);
-      return;
-    } catch (error) {
-      if (error?.name === "AbortError") {
-        if (budgetStatus) budgetStatus.textContent = "No se compartió el presupuesto. Podés intentarlo nuevamente.";
-        return;
-      }
+  budgetDelivery?.classList.remove("is-consent-required");
+  setBudgetSubmitting(true);
+  if (budgetStatus) budgetStatus.textContent = "Estamos creando el pedido. No cierres esta pantalla.";
 
-      if (budgetStatus) {
-        budgetStatus.textContent = "El dispositivo no pudo compartir los PDFs. Abriremos WhatsApp con el detalle para que puedas adjuntarlos desde el chat.";
-      }
+  try {
+    const delivery = await createAndUploadBudgetOrder();
+    setBudgetProgress(100, `Pedido ${delivery.orderId} listo`, "Abriendo WhatsApp con el detalle y el enlace a los PDFs...");
+    if (budgetStatus) {
+      budgetStatus.textContent = "WhatsApp se abrirá con el mensaje preparado. Revisalo y tocá Enviar para compartirlo con la imprenta.";
     }
+    setBudgetSubmitting(false);
+    window.location.assign(delivery.whatsappUrl);
+  } catch (error) {
+    setBudgetProgress(0, "No pudimos completar el pedido", error.message || "Intentá nuevamente.");
+    if (budgetStatus) budgetStatus.textContent = error.message || "No pudimos crear el pedido. Intentá nuevamente.";
+    setBudgetSubmitting(false);
   }
-
-  const whatsappUrl = budgetWhatsapp?.dataset.whatsappUrl;
-  if (whatsappUrl) window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-  if (budgetStatus) {
-    budgetStatus.textContent = "WhatsApp se abrió con el detalle. Adjuntá allí los mismos PDFs que cargaste en el cotizador.";
-  }
-  setBudgetFocus(false);
 }
 
 function initBudgetCalculator() {
@@ -695,6 +799,12 @@ function initBudgetCalculator() {
   updateBudgetEstimate();
 
   budgetWhatsapp?.addEventListener("click", handleBudgetStart);
+  budgetConsent?.addEventListener("change", () => {
+    budgetDelivery?.classList.remove("is-consent-required");
+    if (budgetConsent.checked && budgetStatus) {
+      budgetStatus.textContent = "Listo. Crearemos el pedido privado y después abriremos WhatsApp para que confirmes el envío.";
+    }
+  });
   budgetSessionAction?.addEventListener("click", () => {
     setBudgetFocus(!isBudgetFocused, { focusSession: !isBudgetFocused });
   });
@@ -711,6 +821,9 @@ function initBudgetCalculator() {
     if (!removeButton) return;
 
     budgetDocuments = budgetDocuments.filter((documentItem) => documentItem.key !== removeButton.dataset.budgetRemove);
+    if (budgetConsent) budgetConsent.checked = false;
+    if (budgetProgress) budgetProgress.hidden = true;
+    budgetDelivery?.classList.remove("is-consent-required");
     renderBudgetDocuments();
     if (!budgetDocuments.length) setBudgetFocus(false, { restoreFocus: false });
     if (budgetStatus) {
@@ -854,7 +967,10 @@ function setService(serviceName) {
 function toTitleCase(value) {
   return value
     .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toLocaleUpperCase("es-AR") + word.slice(1))
+    .join(" ");
 }
 
 function getWorkImageData(path) {
@@ -1015,14 +1131,15 @@ function getRouletteMetrics() {
   const sceneBox = rouletteTrack?.closest(".roulette-scene")?.getBoundingClientRect();
   const width = sceneBox?.width || window.innerWidth;
   const height = sceneBox?.height || 620;
+  const isShortDesktop = width >= 981 && height < 680;
 
   return {
     width,
     height,
     spread: Math.max(width < 620 ? 126 : 230, Math.min(width * 0.24, 390)),
     depth: Math.max(72, Math.min(width * 0.095, 128)),
-    activeLift: Math.max(12, Math.min(height * 0.045, 34)),
-    activeScale: width < 620 ? 1.04 : 1.22,
+    activeLift: isShortDesktop ? 16 : Math.max(12, Math.min(height * 0.045, 34)),
+    activeScale: width < 620 ? 1.04 : isShortDesktop ? 1 : 1.22,
     sideScaleStart: width < 620 ? 0.72 : 0.78,
     sideScaleStep: width < 620 ? 0.075 : 0.08,
   };

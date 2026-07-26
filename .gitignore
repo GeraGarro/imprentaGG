@@ -7,6 +7,15 @@
 .codex-*
 *.log
 
+# Node.js and Cloudflare local state
+node_modules/
+.wrangler/
+.dev.vars
+.env
+.env.*
+!.env.example
+dist/
+
 # OS metadata
 .DS_Store
 Thumbs.db

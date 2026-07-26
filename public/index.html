@@ -228,7 +228,7 @@
             <div class="contact-copy">
                 <p class="eyebrow">Cotizador de impresiones</p>
                 <h2>Cotizá cada PDF y obtené el total al instante.</h2>
-                <p class="contact-detail">Configurá color, caras, copias y anillado por archivo. Al finalizar, continuá el pedido con todo el detalle por WhatsApp.</p>
+                <p class="contact-detail">Configurá color, caras, copias y anillado por archivo. Al finalizar crearemos un pedido privado con los PDFs y abriremos WhatsApp con todo el detalle listo para enviar.</p>
             </div>
             <form class="budget-panel" data-budget-form>
                 <div class="budget-session" data-budget-session hidden>
@@ -269,6 +269,26 @@
                     <div>
                         <span>Presupuesto final</span>
                         <strong data-budget-total>$0</strong>
+                    </div>
+                </div>
+
+                <div class="budget-delivery" data-budget-delivery>
+                    <div class="budget-delivery-copy">
+                        <span>Entrega segura</span>
+                        <strong>Pedido privado para WhatsApp</strong>
+                        <p>Los PDFs se guardarán temporalmente para que la imprenta pueda descargarlos desde el mensaje.</p>
+                    </div>
+                    <label class="budget-consent">
+                        <input type="checkbox" data-budget-consent>
+                        <span>Acepto la carga temporal de estos archivos. Se eliminarán automáticamente después de 7 días.</span>
+                    </label>
+                    <div class="budget-progress" data-budget-progress hidden aria-live="polite">
+                        <div>
+                            <strong data-budget-progress-label>Preparando pedido</strong>
+                            <span data-budget-progress-value>0%</span>
+                        </div>
+                        <progress max="100" value="0" data-budget-progress-bar>0%</progress>
+                        <small data-budget-progress-detail>Validando los archivos...</small>
                     </div>
                 </div>
 
