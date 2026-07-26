@@ -4,6 +4,8 @@ export const BUDGET_PRICES = Object.freeze({
   binding: 2500,
 });
 
+export const PHOTO_SHEET_PRICE = 2500;
+
 export const PHOTO_FORMATS = Object.freeze({
   5: { label: "5 × 5 cm", price: 500, width: 5, height: 5 },
   6: { label: "6 × 6 cm", price: 500, width: 6, height: 6 },
@@ -210,10 +212,13 @@ export function calculateQuoteItem(item) {
     const format = PHOTO_FORMATS[item.size];
     const quantity = requireInteger(item.quantity, "La cantidad de fotografías", 1, 500);
     const layout = calculateStickerLayout(format.width, format.height, quantity);
+    const isSingleUnit = quantity === 1;
     return {
       ...layout,
+      isSingleUnit,
       unitPrice: format.price,
-      total: format.price * quantity,
+      sheetPrice: PHOTO_SHEET_PRICE,
+      total: isSingleUnit ? format.price : layout.sheets * PHOTO_SHEET_PRICE,
       pending: false,
     };
   }
@@ -296,9 +301,12 @@ export function buildWhatsAppMessage(order, viewUrl) {
     if (item.type === "photo") {
       const format = PHOTO_FORMATS[item.size];
       const result = calculateQuoteItem(item);
+      const pricingLine = result.isSingleUnit
+        ? `Precio individual: ${formatArs(result.unitPrice)}`
+        : `${result.sheets} hoja${result.sheets === 1 ? "" : "s"} A4 × ${formatArs(result.sheetPrice)}`;
       return [
         `Foto ${index + 1}: ${format.label} · ${item.quantity} unidad${item.quantity === 1 ? "" : "es"}`,
-        `${result.perSheet} por hoja A4 · ${result.sheets} hoja${result.sheets === 1 ? "" : "s"}`,
+        `${result.perSheet} por hoja A4 · ${pricingLine}`,
         `Subtotal: ${formatArs(result.total)}`,
       ].join("\n");
     }

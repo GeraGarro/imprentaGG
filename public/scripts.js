@@ -183,6 +183,7 @@ const BUDGET_STICKER_MATERIALS = Object.freeze({
   transparente: { label: "Papel transparente", price: 3500 },
   holografico: { label: "Papel holográfico", price: 4000 },
 });
+const BUDGET_PHOTO_SHEET_PRICE = 2500;
 const BUDGET_WHATSAPP_NUMBER = "5492665050096";
 const A4_WIDTH = 20.2;
 const A4_HEIGHT = 29;
@@ -415,10 +416,9 @@ function getBudgetTotals() {
 
   budgetQuoteItems.forEach((item) => {
     if (item.type === "photo") {
-      const format = BUDGET_PHOTO_FORMATS[item.size] || BUDGET_PHOTO_FORMATS[5];
-      const subtotal = format.price * normalizeBudgetInteger(item.quantity, 1, 500);
-      totals.photoTotal += subtotal;
-      totals.total += subtotal;
+      const details = getPhotoItemDetails(item);
+      totals.photoTotal += details.total;
+      totals.total += details.total;
     }
 
     if (item.type === "sticker") {
@@ -505,11 +505,14 @@ function getPhotoItemDetails(item) {
   const format = BUDGET_PHOTO_FORMATS[item.size] || BUDGET_PHOTO_FORMATS[5];
   const quantity = normalizeBudgetInteger(item.quantity, 1, 500);
   const layout = calculateStickerLayout(format.width, format.height, quantity);
+  const isSingleUnit = quantity === 1;
   return {
     format,
     quantity,
     ...layout,
-    total: format.price * quantity,
+    isSingleUnit,
+    sheetPrice: BUDGET_PHOTO_SHEET_PRICE,
+    total: isSingleUnit ? format.price : layout.sheets * BUDGET_PHOTO_SHEET_PRICE,
   };
 }
 
@@ -539,7 +542,9 @@ function renderBudgetQuoteItems() {
           <div class="budget-text-item-index">Foto ${index + 1}</div>
           <div class="budget-text-item-copy">
             <strong>${escapeHtml(details.format.label)} · ${details.quantity} unidad${details.quantity === 1 ? "" : "es"}</strong>
-            <span>${details.perSheet} por A4 · ${details.sheets} hoja${details.sheets === 1 ? "" : "s"} · ${formatBudgetCurrency(details.format.price)} por foto</span>
+            <span>${details.isSingleUnit
+              ? `${formatBudgetCurrency(details.format.price)} precio individual`
+              : `${details.perSheet} por A4 · ${details.sheets} hoja${details.sheets === 1 ? "" : "s"} × ${formatBudgetCurrency(details.sheetPrice)}`}</span>
           </div>
           <strong class="budget-text-item-total">${formatBudgetCurrency(details.total)}</strong>
           <button type="button" data-budget-remove-quote="${escapeHtml(item.key)}" aria-label="Quitar fotografías ${details.format.label}">×</button>
@@ -574,13 +579,15 @@ function renderBudgetPhotoPreview() {
   const format = BUDGET_PHOTO_FORMATS[selectedSize] || BUDGET_PHOTO_FORMATS[5];
   const quantity = normalizeBudgetInteger(budgetPhotoQuantity.value, 1, 500);
   const layout = calculateStickerLayout(format.width, format.height, quantity);
+  const isSingleUnit = quantity === 1;
+  const total = isSingleUnit ? format.price : layout.sheets * BUDGET_PHOTO_SHEET_PRICE;
   if (budgetPhotoSizeOutput) budgetPhotoSizeOutput.textContent = format.label;
   setBudgetRangeProgress(budgetPhotoSize);
   budgetPhotoPreview.innerHTML = `
-    <div><span>Pedido</span><strong>${quantity} foto${quantity === 1 ? "" : "s"} · ${formatBudgetCurrency(format.price)} c/u</strong></div>
+    <div><span>Pedido</span><strong>${quantity} foto${quantity === 1 ? "" : "s"}${isSingleUnit ? ` · ${formatBudgetCurrency(format.price)}` : ""}</strong></div>
     <div><span>Por hoja A4</span><strong>${layout.perSheet}</strong></div>
     <div><span>Hojas necesarias</span><strong>${layout.sheets}</strong></div>
-    <div class="is-total"><span>Subtotal</span><strong>${formatBudgetCurrency(format.price * quantity)}</strong></div>`;
+    <div class="is-total"><span>Subtotal</span><strong>${formatBudgetCurrency(total)}</strong></div>`;
 }
 
 function renderBudgetStickerPreview() {
@@ -621,7 +628,9 @@ function getBudgetOverviewRows() {
       return {
         label: "Foto",
         title: `${details.format.label} · ${details.quantity} unidad${details.quantity === 1 ? "" : "es"}`,
-        detail: `${details.perSheet} por A4 · ${details.sheets} hoja${details.sheets === 1 ? "" : "s"} · ${formatBudgetCurrency(details.format.price)} por foto`,
+        detail: details.isSingleUnit
+          ? `${formatBudgetCurrency(details.format.price)} precio individual`
+          : `${details.perSheet} por A4 · ${details.sheets} hoja${details.sheets === 1 ? "" : "s"} × ${formatBudgetCurrency(details.sheetPrice)}`,
         total: formatBudgetCurrency(details.total),
         pending: false,
       };
@@ -709,6 +718,7 @@ function setBudgetTool(tool) {
   budgetToolPanels.forEach((panel) => {
     panel.hidden = panel.dataset.budgetToolPanel !== activeBudgetTool;
   });
+  if (activeBudgetTool === "photo") syncBudgetPhotoItem();
 }
 
 function getBudgetDocumentMeta(documentItem) {
@@ -1234,9 +1244,12 @@ function buildTextBudgetWhatsAppMessage() {
   const itemLines = budgetQuoteItems.map((item, index) => {
     if (item.type === "photo") {
       const details = getPhotoItemDetails(item);
+      const pricingLine = details.isSingleUnit
+        ? `Precio individual: ${formatBudgetCurrency(details.format.price)}`
+        : `${details.sheets} hoja${details.sheets === 1 ? "" : "s"} A4 × ${formatBudgetCurrency(details.sheetPrice)}`;
       return [
         `Foto ${index + 1}: ${details.format.label} · ${details.quantity} unidad${details.quantity === 1 ? "" : "es"}`,
-        `${details.perSheet} por hoja A4 · ${details.sheets} hoja${details.sheets === 1 ? "" : "s"}`,
+        `${details.perSheet} por hoja A4 · ${pricingLine}`,
         `Subtotal: ${formatBudgetCurrency(details.total)}`,
       ].join("\n");
     }
@@ -1402,6 +1415,7 @@ function initBudgetCalculator() {
 
   [budgetPhotoSize, budgetPhotoQuantity].forEach((control) => {
     control?.addEventListener("input", syncBudgetPhotoItem);
+    control?.addEventListener("change", syncBudgetPhotoItem);
   });
   [budgetStickerSize, budgetStickerMaterial, budgetStickerQuantity].forEach((control) => {
     control?.addEventListener("input", renderBudgetStickerPreview);

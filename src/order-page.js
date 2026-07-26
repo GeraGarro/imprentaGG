@@ -81,7 +81,7 @@ export function renderOrderPage(order, token) {
         <dl class="order-document-specs">
           <div><dt>Formato</dt><dd>${escapeHtml(format.label)}</dd></div>
           <div><dt>Cantidad</dt><dd>${item.quantity}</dd></div>
-          <div><dt>Precio unitario</dt><dd>${escapeHtml(formatArs(format.price))}</dd></div>
+          <div><dt>${result.isSingleUnit ? "Precio individual" : "Precio por hoja A4"}</dt><dd>${escapeHtml(formatArs(result.isSingleUnit ? result.unitPrice : result.sheetPrice))}</dd></div>
           <div><dt>Por hoja A4</dt><dd>${result.perSheet}</dd></div>
           <div><dt>Hojas necesarias</dt><dd>${result.sheets}</dd></div>
         </dl>

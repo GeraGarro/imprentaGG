@@ -75,10 +75,10 @@ test("suma PDFs, fotografías y hojas A4 de stickers", () => {
   }, limits);
   const totals = calculateTotals(documents, quoteItems);
 
-  assert.equal(totals.photoTotal, 3000);
+  assert.equal(totals.photoTotal, 2500);
   assert.equal(totals.stickerTotal, 5000);
   assert.equal(totals.pendingItems, 0);
-  assert.equal(totals.total, 30500);
+  assert.equal(totals.total, 30000);
   assert.deepEqual(calculateStickerLayout(5, 5, 24), {
     width: 5,
     height: 5,
@@ -112,7 +112,7 @@ test("calcula capacidad sobre 20,2 × 29 cm para todos los tamaños", () => {
   });
 });
 
-test("aplica precios fotográficos por intervalo y formato", () => {
+test("aplica precios individuales a una única fotografía", () => {
   const sizes = ["5", "6", "7", "8", "9", "10", "11", "12", "15", "a4"];
   const { documents, quoteItems } = normalizeOrderDraft({
     documents: [draftDocument()],
@@ -122,6 +122,17 @@ test("aplica precios fotográficos por intervalo y formato", () => {
 
   assert.equal(totals.photoTotal, 9500);
   assert.equal(totals.total, 32000);
+});
+
+test("cotiza múltiples fotografías por hojas A4 necesarias", () => {
+  const { documents, quoteItems } = normalizeOrderDraft({
+    documents: [draftDocument()],
+    quoteItems: [{ type: "photo", size: "8", quantity: 12 }],
+  }, limits);
+  const totals = calculateTotals(documents, quoteItems);
+
+  assert.equal(totals.photoTotal, 5000);
+  assert.equal(totals.total, 27500);
 });
 
 test("calcula el valor de cada material autoadhesivo", () => {
@@ -174,8 +185,9 @@ test("genera un mensaje con pedido, total y enlace privado", () => {
   const message = buildWhatsAppMessage(order, "https://example.com/pedido/privado");
 
   assert.match(message, /GG-20260726-ABC123/);
-  assert.match(message, /\$\s?26\.000/);
+  assert.match(message, /\$\s?27\.500/);
   assert.match(message, /Foto 1/);
+  assert.match(message, /1 hoja A4 × \$\s?2\.500/);
   assert.match(message, /Stickers 2/);
   assert.match(message, /Papel mate · 20 por plancha A4 · 1 plancha/);
   assert.match(message, /https:\/\/example\.com\/pedido\/privado/);
