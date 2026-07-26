@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1200 800"
+     width="1200"
+     height="800"
+     role="img"
+     aria-labelledby="title desc">
+  <title id="title">Persona enviando un archivo desde un celular para ser procesado</title>
+  <desc id="desc">Ilustración animada de línea azul, con una persona usando un celular, un documento que viaja hacia una nube y engranajes que giran.</desc>
+
+  <defs>
+    <style>
+      :root { --blue:#2443a6; --soft:#eef2ff; }
+      .line {
+        fill:none;
+        stroke:var(--blue);
+        stroke-width:9;
+        stroke-linecap:round;
+        stroke-linejoin:round;
+      }
+      .thin { stroke-width:7; }
+      .fill-blue { fill:var(--blue); stroke:none; }
+      .soft { fill:var(--soft); stroke:var(--blue); stroke-width:8; }
+      .paper { fill:white; stroke:var(--blue); stroke-width:8; stroke-linejoin:round; }
+      .dash {
+        fill:none;
+        stroke:var(--blue);
+        stroke-width:7;
+        stroke-linecap:round;
+        stroke-dasharray:18 22;
+      }
+    </style>
+
+    <path id="transferPath"
+          d="M 650 340 C 770 260, 860 230, 990 295" />
+
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#2443a6" flood-opacity="0.13"/>
+    </filter>
+  </defs>
+
+  <!-- PERSONA -->
+  <g id="person">
+    <animateTransform attributeName="transform"
+                      type="translate"
+                      values="0 0; 0 -7; 0 0"
+                      dur="3.2s"
+                      repeatCount="indefinite"/>
+
+    <!-- cabeza -->
+    <path class="line" d="M365 142
+      C345 154 339 182 343 208
+      C347 239 368 262 397 262
+      C427 262 448 239 451 206
+      C454 174 438 145 410 138
+      C393 134 378 136 365 142Z"/>
+    <path class="fill-blue" d="M342 180
+      C330 154 342 117 369 103
+      C397 87 440 93 457 121
+      C469 142 460 169 446 181
+      C436 161 424 156 410 157
+      C397 158 389 149 384 139
+      C378 157 366 171 342 180Z"/>
+    <path class="line thin" d="M382 196 L384 211"/>
+    <path class="line thin" d="M420 194 L422 210"/>
+    <path class="line thin" d="M387 228 C397 237 411 237 421 226"/>
+    <path class="line thin" d="M398 260 L398 292"/>
+
+    <!-- torso / camiseta -->
+    <path class="line" d="M311 292
+      C344 274 371 274 399 287
+      C429 273 466 282 501 305
+      L535 324
+      L500 407
+      L459 388
+      L470 526
+      C412 547 350 545 293 522
+      L310 389
+      L270 413
+      L229 337
+      Z"/>
+
+    <!-- brazo izquierdo -->
+    <path class="line" d="M273 328
+      C231 348 202 385 199 430
+      C197 464 214 489 239 494
+      C263 499 279 479 283 452
+      L300 390"/>
+    <path class="line thin" d="M205 430
+      C200 448 199 462 207 477"/>
+    <path class="line thin" d="M220 431
+      C215 451 215 467 223 482"/>
+    <path class="line thin" d="M235 429
+      C231 450 231 468 239 483"/>
+
+    <!-- brazo derecho hacia celular -->
+    <path class="line" d="M498 314
+      C535 323 567 342 590 372
+      C605 392 610 414 600 430
+      C588 449 560 447 546 429
+      L497 372"/>
+    <path class="line" d="M470 347
+      C501 357 527 372 548 394"/>
+
+    <!-- mano que toca -->
+    <g id="tapHand">
+      <animateTransform attributeName="transform"
+                        type="rotate"
+                        values="0 520 359; -5 520 359; 0 520 359"
+                        keyTimes="0;0.45;1"
+                        dur="1.25s"
+                        repeatCount="indefinite"/>
+      <path class="line thin" d="M462 345
+        C476 344 492 350 506 359
+        L541 382
+        C551 389 551 401 543 407
+        C535 414 526 408 520 402
+        L501 386"/>
+      <path class="line thin" d="M487 356
+        L535 333
+        C545 329 555 333 558 342
+        C561 351 554 359 545 362
+        L513 374"/>
+    </g>
+
+    <!-- celular -->
+    <g filter="url(#softShadow)">
+      <rect x="535" y="300" width="86" height="150" rx="16" class="paper"
+            transform="rotate(15 578 375)"/>
+      <circle cx="584" cy="323" r="6" class="fill-blue"/>
+      <path class="line thin" d="M560 412 L594 421"/>
+    </g>
+
+    <!-- piernas -->
+    <path class="line" d="M338 527
+      C314 578 275 625 222 677
+      L114 760
+      L52 692
+      L155 591
+      L290 489"/>
+    <path class="line" d="M433 523
+      C476 570 510 621 536 675
+      L596 754
+      L518 785
+      L454 700
+      C424 653 397 616 364 586"/>
+    <path class="line thin" d="M192 656 C221 640 248 621 276 597"/>
+    <path class="line thin" d="M467 649 C487 672 503 696 516 722"/>
+
+    <!-- zapatillas -->
+    <path class="line" d="M52 692
+      C26 716 20 751 33 775
+      C48 800 103 803 143 789
+      L114 760Z"/>
+    <path class="line thin" d="M49 735 C74 739 94 748 113 766"/>
+    <path class="line thin" d="M66 716 L91 742"/>
+    <path class="line" d="M518 785
+      C539 808 577 806 617 783
+      C652 763 666 741 655 729
+      C644 716 618 723 596 754Z"/>
+    <path class="line thin" d="M570 759 C598 759 620 751 640 738"/>
+    <path class="line thin" d="M588 744 L607 758"/>
+  </g>
+
+  <!-- RUTA DE TRANSFERENCIA -->
+  <path class="dash" d="M 650 340 C 770 260, 860 230, 990 295">
+    <animate attributeName="stroke-dashoffset"
+             values="0;-80"
+             dur="1.6s"
+             repeatCount="indefinite"/>
+  </path>
+
+  <!-- líneas de salida -->
+  <g opacity="0">
+    <path class="line thin" d="M635 329 L677 305"/>
+    <path class="line thin" d="M645 349 L691 326"/>
+    <animate attributeName="opacity"
+             values="0;1;1;0"
+             keyTimes="0;0.18;0.55;1"
+             dur="4.8s"
+             repeatCount="indefinite"/>
+  </g>
+
+  <!-- ARCHIVO VIAJANDO -->
+  <g id="file" filter="url(#softShadow)">
+    <path class="paper" d="M-38 -52 H22 L48 -26 V54 H-38 Z"/>
+    <path class="line thin" d="M22 -52 V-26 H48"/>
+    <path class="line thin" d="M-18 -11 H24"/>
+    <path class="line thin" d="M-18 12 H28"/>
+    <path class="line thin" d="M-18 35 H14"/>
+    <animateMotion dur="4.8s"
+                   repeatCount="indefinite"
+                   rotate="auto"
+                   keyPoints="0;0.05;0.88;1"
+                   keyTimes="0;0.10;0.80;1"
+                   calcMode="spline"
+                   keySplines=".3 0 .2 1; .2 0 .2 1; .4 0 1 1">
+      <mpath xlink:href="#transferPath"/>
+    </animateMotion>
+    <animateTransform attributeName="transform"
+                      additive="sum"
+                      type="scale"
+                      values=".82;.96;1;.72"
+                      keyTimes="0;.15;.72;1"
+                      dur="4.8s"
+                      repeatCount="indefinite"/>
+    <animate attributeName="opacity"
+             values="0;1;1;0"
+             keyTimes="0;.08;.82;1"
+             dur="4.8s"
+             repeatCount="indefinite"/>
+  </g>
+
+  <!-- NUBE DE PROCESAMIENTO -->
+  <g id="cloud" filter="url(#softShadow)">
+    <animateTransform attributeName="transform"
+                      type="scale"
+                      values="1;1.018;1"
+                      additive="sum"
+                      dur="2.4s"
+                      repeatCount="indefinite"/>
+
+    <path class="soft" d="M888 412
+      C852 410 830 388 831 358
+      C832 327 858 305 891 307
+      C902 268 935 243 975 248
+      C1018 253 1043 283 1048 319
+      C1083 313 1112 335 1117 366
+      C1122 396 1100 421 1065 422
+      H891
+      C890 422 889 417 888 412Z"/>
+
+    <!-- engranaje 1 -->
+    <g transform="translate(948 357)">
+      <animateTransform attributeName="transform"
+                        additive="sum"
+                        type="rotate"
+                        from="0 0 0"
+                        to="360 0 0"
+                        dur="3.2s"
+                        repeatCount="indefinite"/>
+      <circle r="29" class="line"/>
+      <circle r="10" class="line thin"/>
+      <g class="line thin">
+        <path d="M0 -43 V-31"/>
+        <path d="M0 31 V43"/>
+        <path d="M-43 0 H-31"/>
+        <path d="M31 0 H43"/>
+        <path d="M-31 -31 L-22 -22"/>
+        <path d="M22 22 L31 31"/>
+        <path d="M31 -31 L22 -22"/>
+        <path d="M-22 22 L-31 31"/>
+      </g>
+    </g>
+
+    <!-- engranaje 2 -->
+    <g transform="translate(1029 340)">
+      <animateTransform attributeName="transform"
+                        additive="sum"
+                        type="rotate"
+                        from="360 0 0"
+                        to="0 0 0"
+                        dur="4s"
+                        repeatCount="indefinite"/>
+      <circle r="38" class="line"/>
+      <circle r="13" class="line thin"/>
+      <g class="line thin">
+        <path d="M0 -54 V-41"/>
+        <path d="M0 41 V54"/>
+        <path d="M-54 0 H-41"/>
+        <path d="M41 0 H54"/>
+        <path d="M-38 -38 L-29 -29"/>
+        <path d="M29 29 L38 38"/>
+        <path d="M38 -38 L29 -29"/>
+        <path d="M-29 29 L-38 38"/>
+      </g>
+    </g>
+
+    <!-- brillo -->
+    <g opacity="0">
+      <path class="line thin" d="M1104 274 L1125 255"/>
+      <path class="line thin" d="M1117 297 L1147 292"/>
+      <path class="line thin" d="M1082 252 L1087 221"/>
+      <animate attributeName="opacity"
+               values="0;0;1;0"
+               keyTimes="0;.72;.84;1"
+               dur="4.8s"
+               repeatCount="indefinite"/>
+    </g>
+
+    <!-- check de finalización -->
+    <g opacity="0">
+      <circle cx="1092" cy="438" r="32" fill="white" stroke="var(--blue)" stroke-width="8"/>
+      <path class="line thin" d="M1078 438 L1088 449 L1107 427"/>
+      <animate attributeName="opacity"
+               values="0;0;1;1;0"
+               keyTimes="0;.76;.82;.94;1"
+               dur="4.8s"
+               repeatCount="indefinite"/>
+      <animateTransform attributeName="transform"
+                        type="scale"
+                        values=".6;.6;1.12;1;1"
+                        keyTimes="0;.76;.84;.90;1"
+                        dur="4.8s"
+                        repeatCount="indefinite"/>
+    </g>
+  </g>
+
+  <!-- ondas de toque -->
+  <g opacity="0">
+    <circle cx="558" cy="344" r="20" class="line thin"/>
+    <circle cx="558" cy="344" r="34" class="line thin"/>
+    <animate attributeName="opacity"
+             values="0;0.8;0"
+             dur="1.25s"
+             repeatCount="indefinite"/>
+    <animateTransform attributeName="transform"
+                      type="scale"
+                      values=".55;1.05;1.25"
+                      dur="1.25s"
+                      repeatCount="indefinite"/>
+  </g>
+</svg>
