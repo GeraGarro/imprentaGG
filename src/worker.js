@@ -187,7 +187,7 @@ async function createOrder(request, env) {
   }));
 
   const order = {
-    version: 1,
+    version: 3,
     id: orderId,
     status: "uploading",
     createdAt: createdAt.toISOString(),
@@ -197,7 +197,8 @@ async function createOrder(request, env) {
     accessTokenHash: hashToken(token),
     totalSize: normalized.totalSize,
     documents,
-    totals: calculateTotals(documents),
+    quoteItems: normalized.quoteItems,
+    totals: calculateTotals(documents, normalized.quoteItems),
   };
 
   await saveManifest(env, order);
@@ -266,7 +267,7 @@ async function uploadDocument(request, env, orderId, fileId) {
   documentItem.uploadedAt = new Date().toISOString();
   documentItem.storageKey = storageKey;
   documentItem.checksum = checksum;
-  order.totals = calculateTotals(order.documents);
+  order.totals = calculateTotals(order.documents, order.quoteItems || []);
   await saveManifest(env, order);
 
   return jsonResponse({
@@ -305,7 +306,7 @@ async function finalizeOrder(request, env, orderId) {
   if (order.status !== "ready") {
     order.status = "ready";
     order.finalizedAt = new Date().toISOString();
-    order.totals = calculateTotals(order.documents);
+    order.totals = calculateTotals(order.documents, order.quoteItems || []);
     await saveManifest(env, order);
   }
 

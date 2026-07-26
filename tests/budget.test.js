@@ -4,6 +4,7 @@ import { PDFDocument } from "pdf-lib";
 import {
   buildWhatsAppMessage,
   calculateDocument,
+  calculateStickerLayout,
   calculateTotals,
   normalizeOrderDraft,
 } from "../src/budget.js";
@@ -57,8 +58,82 @@ test("suma configuraciones independientes de múltiples PDFs", () => {
     sheets: 124,
     printTotal: 24600,
     bindingTotal: 2500,
+    photoTotal: 0,
+    stickerTotal: 0,
+    pendingItems: 0,
     total: 27100,
   });
+});
+
+test("suma PDFs, fotografías y hojas A4 de stickers", () => {
+  const { documents, quoteItems } = normalizeOrderDraft({
+    documents: [draftDocument()],
+    quoteItems: [
+      { type: "photo", size: "10", quantity: 3 },
+      { type: "sticker", size: "5", material: "mate", quantity: 24 },
+    ],
+  }, limits);
+  const totals = calculateTotals(documents, quoteItems);
+
+  assert.equal(totals.photoTotal, 3000);
+  assert.equal(totals.stickerTotal, 5000);
+  assert.equal(totals.pendingItems, 0);
+  assert.equal(totals.total, 30500);
+  assert.deepEqual(calculateStickerLayout(5, 5, 24), {
+    width: 5,
+    height: 5,
+    quantity: 24,
+    columns: 4,
+    rows: 5,
+    perSheet: 20,
+    rotated: false,
+    sheets: 2,
+  });
+});
+
+test("calcula capacidad sobre 20,2 × 29 cm para todos los tamaños", () => {
+  const cases = [
+    { size: 5, perSheet: 20, sheets: 2 },
+    { size: 6, perSheet: 12, sheets: 2 },
+    { size: 7, perSheet: 8, sheets: 3 },
+    { size: 8, perSheet: 6, sheets: 4 },
+    { size: 9, perSheet: 6, sheets: 4 },
+    { size: 10, perSheet: 4, sheets: 6 },
+    { size: 11, perSheet: 2, sheets: 11 },
+    { size: 12, perSheet: 2, sheets: 11 },
+    { size: 15, perSheet: 1, sheets: 21 },
+    { width: 20.2, height: 29, perSheet: 1, sheets: 21 },
+  ];
+
+  cases.forEach(({ size, width = size, height = size, perSheet, sheets }) => {
+    const layout = calculateStickerLayout(width, height, 21);
+    assert.equal(layout.perSheet, perSheet);
+    assert.equal(layout.sheets, sheets);
+  });
+});
+
+test("aplica precios fotográficos por intervalo y formato", () => {
+  const sizes = ["5", "6", "7", "8", "9", "10", "11", "12", "15", "a4"];
+  const { documents, quoteItems } = normalizeOrderDraft({
+    documents: [draftDocument()],
+    quoteItems: sizes.map((size) => ({ type: "photo", size, quantity: 1 })),
+  }, limits);
+  const totals = calculateTotals(documents, quoteItems);
+
+  assert.equal(totals.photoTotal, 9500);
+  assert.equal(totals.total, 32000);
+});
+
+test("calcula el valor de cada material autoadhesivo", () => {
+  const materials = ["mate", "brillante", "transparente", "holografico"];
+  const { documents, quoteItems } = normalizeOrderDraft({
+    documents: [draftDocument()],
+    quoteItems: materials.map((material) => ({ type: "sticker", size: "5", material, quantity: 1 })),
+  }, limits);
+  const totals = calculateTotals(documents, quoteItems);
+
+  assert.equal(totals.stickerTotal, 13000);
+  assert.equal(totals.total, 35500);
 });
 
 test("rechaza más cuadernos que copias", () => {
@@ -80,19 +155,29 @@ test("rechaza archivos que superan los límites", () => {
 });
 
 test("genera un mensaje con pedido, total y enlace privado", () => {
-  const { documents } = normalizeOrderDraft({ documents: [draftDocument()] }, limits);
+  const { documents, quoteItems } = normalizeOrderDraft({
+    documents: [draftDocument()],
+    quoteItems: [
+      { type: "photo", size: "5", quantity: 2 },
+      { type: "sticker", size: "5", material: "mate", quantity: 1 },
+    ],
+  }, limits);
   documents[0].pages = 200;
   documents[0].uploaded = true;
   const order = {
     id: "GG-20260726-ABC123",
     documents,
-    totals: calculateTotals(documents),
+    quoteItems,
+    totals: calculateTotals(documents, quoteItems),
     retentionDays: 7,
   };
   const message = buildWhatsAppMessage(order, "https://example.com/pedido/privado");
 
   assert.match(message, /GG-20260726-ABC123/);
-  assert.match(message, /\$\s?22\.500/);
+  assert.match(message, /\$\s?26\.000/);
+  assert.match(message, /Foto 1/);
+  assert.match(message, /Stickers 2/);
+  assert.match(message, /Papel mate · 20 por plancha A4 · 1 plancha/);
   assert.match(message, /https:\/\/example\.com\/pedido\/privado/);
 });
 

@@ -1,4 +1,4 @@
-import { calculateDocument, formatArs } from "./budget.js";
+import { calculateDocument, calculateQuoteItem, formatArs, PHOTO_FORMATS } from "./budget.js";
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({
@@ -63,6 +63,55 @@ export function renderOrderPage(order, token) {
     </li>`;
   }).join("");
 
+  const quoteItems = Array.isArray(order.quoteItems) ? order.quoteItems : [];
+  const quoteCards = quoteItems.map((item, index) => {
+    const tone = (order.documents.length + index) % 6;
+    if (item.type === "photo") {
+      const format = PHOTO_FORMATS[item.size];
+      const result = calculateQuoteItem(item);
+      return `<li class="order-document order-tone-${tone}">
+        <div class="order-document-heading">
+          <span>FOTO</span>
+          <div>
+            <h2>Fotografías ${escapeHtml(format.label)}</h2>
+            <p>Las imágenes se envían por WhatsApp</p>
+          </div>
+          <strong>${escapeHtml(formatArs(result.total))}</strong>
+        </div>
+        <dl class="order-document-specs">
+          <div><dt>Formato</dt><dd>${escapeHtml(format.label)}</dd></div>
+          <div><dt>Cantidad</dt><dd>${item.quantity}</dd></div>
+          <div><dt>Precio unitario</dt><dd>${escapeHtml(formatArs(format.price))}</dd></div>
+          <div><dt>Por hoja A4</dt><dd>${result.perSheet}</dd></div>
+          <div><dt>Hojas necesarias</dt><dd>${result.sheets}</dd></div>
+        </dl>
+      </li>`;
+    }
+
+    const result = calculateQuoteItem(item);
+    const format = PHOTO_FORMATS[item.size] || { label: `${result.width} × ${result.height} cm` };
+    return `<li class="order-document order-tone-${tone}">
+      <div class="order-document-heading">
+        <span>STICKER</span>
+        <div>
+          <h2>Autoadhesivos ${escapeHtml(format.label)}</h2>
+          <p>Las imágenes se envían por WhatsApp</p>
+        </div>
+        <strong>${escapeHtml(formatArs(result.total))}</strong>
+      </div>
+      <dl class="order-document-specs">
+        <div><dt>Cantidad</dt><dd>${result.quantity}</dd></div>
+        <div><dt>Por plancha A4</dt><dd>${result.perSheet}</dd></div>
+        <div><dt>Planchas</dt><dd>${result.sheets}</dd></div>
+        <div><dt>Material</dt><dd>${escapeHtml(result.materialLabel)}</dd></div>
+        <div><dt>Precio por plancha</dt><dd>${escapeHtml(formatArs(result.sheetPrice))}</dd></div>
+      </dl>
+    </li>`;
+  }).join("");
+
+  const photoCount = quoteItems.filter((item) => item.type === "photo").length;
+  const stickerCount = quoteItems.filter((item) => item.type === "sticker").length;
+
   return pageShell(`Pedido ${order.id}`, `
     <header class="order-header">
       <a class="order-brand" href="/" aria-label="Volver a Impresiones GG">
@@ -79,7 +128,7 @@ export function renderOrderPage(order, token) {
           <span>Creado el ${escapeHtml(formatDate(order.createdAt))}</span>
         </div>
         <div class="order-grand-total">
-          <span>Total estimado</span>
+          <span>Total calculado</span>
           <strong>${escapeHtml(formatArs(order.totals.total))}</strong>
         </div>
       </section>
@@ -87,11 +136,11 @@ export function renderOrderPage(order, token) {
       <section class="order-summary" aria-label="Resumen del pedido">
         <div><span>PDFs</span><strong>${order.documents.length}</strong></div>
         <div><span>Páginas</span><strong>${order.totals.pages}</strong></div>
-        <div><span>Hojas</span><strong>${order.totals.sheets}</strong></div>
-        <div><span>Anillado</span><strong>${escapeHtml(formatArs(order.totals.bindingTotal))}</strong></div>
+        <div><span>Fotos</span><strong>${photoCount}</strong></div>
+        <div><span>Stickers</span><strong>${stickerCount}</strong></div>
       </section>
 
-      <ul class="order-documents">${documentCards}</ul>
+      <ul class="order-documents">${documentCards}${quoteCards}</ul>
 
       <footer class="order-footer">
         <strong>Acceso temporal y privado</strong>

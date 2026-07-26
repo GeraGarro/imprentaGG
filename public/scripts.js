@@ -61,6 +61,15 @@ const workImagePaths = [
   "assets/trabajos/img/diseños/WhatsApp Image 2026-07-16 at 21.25.44 (3).jpeg",
 ];
 
+const workVideos = [
+  { title: "Encuadernado profesional", src: "assets/trabajos/movie/trabajo-01-web.webm", poster: "assets/trabajos/movie/trabajo-01-poster.webp" },
+  { title: "Cajita de regalo con bombones", src: "assets/trabajos/movie/trabajo-02-web.webm", poster: "assets/trabajos/movie/trabajo-02-poster.webp" },
+  { title: "caja chica san valentin", src: "assets/trabajos/movie/trabajo-03-web.webm", poster: "assets/trabajos/movie/trabajo-03-poster.webp" },
+  { title: "Caja de Bombones grande", src: "assets/trabajos/movie/trabajo-04-web.webm", poster: "assets/trabajos/movie/trabajo-04-poster.webp" },
+  { title: "Cajita semanal", src: "assets/trabajos/movie/trabajo-05-web.webm", poster: "assets/trabajos/movie/trabajo-05-poster.webp" },
+  { title: "cuaderno de anotaciones personalizado", src: "assets/trabajos/movie/trabajo-06-web.webm", poster: "assets/trabajos/movie/trabajo-06-poster.webp" },
+];
+
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const homeIntro = document.querySelector("[data-home-intro]");
 const header = document.querySelector("[data-header]");
@@ -82,32 +91,67 @@ const previewNote = document.querySelector("[data-preview-note]");
 const previewImage = document.querySelector("[data-preview-image]");
 const revealItems = document.querySelectorAll("[data-reveal]");
 const parallaxItems = document.querySelectorAll("[data-parallax-speed]");
-const autoplayVideos = document.querySelectorAll("[data-autoplay-video]");
+const workVideoPlayer = document.querySelector("[data-work-player]");
+const workVideo = document.querySelector("[data-work-video]");
+const workVideoSource = document.querySelector("[data-work-video-source]");
+const workVideoTitle = document.querySelector("[data-work-video-title]");
+const workVideoCount = document.querySelector("[data-work-video-count]");
+const workVideoSequence = document.querySelector("[data-work-video-sequence]");
+const workVideoPrevious = document.querySelector("[data-work-video-previous]");
+const workVideoNext = document.querySelector("[data-work-video-next]");
 const paletteSwatches = document.querySelectorAll("[data-bg-option]");
 const budgetForm = document.querySelector("[data-budget-form]");
+const budgetOverview = document.querySelector("[data-budget-overview]");
+const budgetOverviewContent = document.querySelector("[data-budget-overview-content]");
+const budgetEditor = document.querySelector("[data-budget-editor]");
+const budgetToolButtons = [...document.querySelectorAll("[data-budget-tool]")];
+const budgetToolPanels = [...document.querySelectorAll("[data-budget-tool-panel]")];
 const budgetUpload = document.querySelector("[data-budget-upload]");
 const budgetFile = document.querySelector("[data-budget-file]");
 const budgetFileName = document.querySelector("[data-budget-file-name]");
 const budgetDocumentList = document.querySelector("[data-budget-document-list]");
+const budgetItemsCount = document.querySelector("[data-budget-items]");
 const budgetDocumentsCount = document.querySelector("[data-budget-documents]");
-const budgetPages = document.querySelector("[data-budget-pages]");
-const budgetSheets = document.querySelector("[data-budget-sheets]");
-const budgetBindingTotal = document.querySelector("[data-budget-binding-total]");
+const budgetPhotosCount = document.querySelector("[data-budget-photos]");
+const budgetStickersCount = document.querySelector("[data-budget-stickers]");
 const budgetTotal = document.querySelector("[data-budget-total]");
+const budgetTotalNote = document.querySelector("[data-budget-total-note]");
 const budgetStatus = document.querySelector("[data-budget-status]");
 const budgetWhatsapp = document.querySelector("[data-budget-whatsapp]");
+const budgetSummary = document.querySelector("[data-budget-summary]");
 const budgetSection = document.querySelector(".budget-section");
 const budgetSession = document.querySelector("[data-budget-session]");
 const budgetSessionStatus = document.querySelector("[data-budget-session-status]");
 const budgetSessionDetail = document.querySelector("[data-budget-session-detail]");
 const budgetSessionAction = document.querySelector("[data-budget-session-action]");
 const budgetDelivery = document.querySelector("[data-budget-delivery]");
+const budgetDeliveryKicker = document.querySelector("[data-budget-delivery-kicker]");
+const budgetDeliveryTitle = document.querySelector("[data-budget-delivery-title]");
+const budgetDeliveryDescription = document.querySelector("[data-budget-delivery-description]");
 const budgetConsent = document.querySelector("[data-budget-consent]");
+const budgetConsentBox = document.querySelector("[data-budget-consent-box]");
 const budgetProgress = document.querySelector("[data-budget-progress]");
 const budgetProgressLabel = document.querySelector("[data-budget-progress-label]");
 const budgetProgressValue = document.querySelector("[data-budget-progress-value]");
 const budgetProgressBar = document.querySelector("[data-budget-progress-bar]");
 const budgetProgressDetail = document.querySelector("[data-budget-progress-detail]");
+const budgetPhotoSize = document.querySelector("[data-budget-photo-size]");
+const budgetPhotoSizeOutput = document.querySelector("[data-budget-photo-size-output]");
+const budgetPhotoQuantity = document.querySelector("[data-budget-photo-quantity]");
+const budgetPhotoPreview = document.querySelector("[data-budget-photo-preview]");
+const budgetPhotoList = document.querySelector("[data-budget-photo-list]");
+const budgetStickerSize = document.querySelector("[data-budget-sticker-size]");
+const budgetStickerSizeOutput = document.querySelector("[data-budget-sticker-size-output]");
+const budgetStickerMaterial = document.querySelector("[data-budget-sticker-material]");
+const budgetStickerQuantity = document.querySelector("[data-budget-sticker-quantity]");
+const budgetStickerPreview = document.querySelector("[data-budget-sticker-preview]");
+const budgetAddSticker = document.querySelector("[data-budget-add-sticker]");
+const budgetStickerList = document.querySelector("[data-budget-sticker-list]");
+const budgetRunning = document.querySelector("[data-budget-running]");
+const budgetRunningList = document.querySelector("[data-budget-running-list]");
+const budgetToolPdfCount = document.querySelector("[data-budget-tool-pdf-count]");
+const budgetToolPhotoCount = document.querySelector("[data-budget-tool-photo-count]");
+const budgetToolStickerCount = document.querySelector("[data-budget-tool-sticker-count]");
 let serviceCards = [];
 const screenSections = [...document.querySelectorAll("[data-screen]")];
 const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -120,6 +164,28 @@ const BUDGET_PRINT_PRICES = {
   color: 200,
 };
 const BUDGET_BINDING_PRICE = 2500;
+const BUDGET_PHOTO_FORMATS = Object.freeze({
+  5: { label: "5 × 5 cm", price: 500, width: 5, height: 5 },
+  6: { label: "6 × 6 cm", price: 500, width: 6, height: 6 },
+  7: { label: "7 × 7 cm", price: 500, width: 7, height: 7 },
+  8: { label: "8 × 8 cm", price: 500, width: 8, height: 8 },
+  9: { label: "9 × 9 cm", price: 500, width: 9, height: 9 },
+  10: { label: "10 × 10 cm", price: 1000, width: 10, height: 10 },
+  11: { label: "11 × 11 cm", price: 1000, width: 11, height: 11 },
+  12: { label: "12 × 12 cm", price: 1000, width: 12, height: 12 },
+  15: { label: "15 × 15 cm", price: 1500, width: 15, height: 15 },
+  a4: { label: "A4", price: 2500, width: 20.2, height: 29 },
+});
+const BUDGET_SIZE_STEPS = Object.freeze(["5", "6", "7", "8", "9", "10", "11", "12", "15", "a4"]);
+const BUDGET_STICKER_MATERIALS = Object.freeze({
+  mate: { label: "Papel mate", price: 2500 },
+  brillante: { label: "Papel brillante", price: 3000 },
+  transparente: { label: "Papel transparente", price: 3500 },
+  holografico: { label: "Papel holográfico", price: 4000 },
+});
+const BUDGET_WHATSAPP_NUMBER = "5492665050096";
+const A4_WIDTH = 20.2;
+const A4_HEIGHT = 29;
 const BUDGET_MAX_FILES = 6;
 const BUDGET_MAX_FILE_SIZE = 20 * 1024 * 1024;
 const BUDGET_MAX_ORDER_SIZE = 60 * 1024 * 1024;
@@ -137,13 +203,19 @@ let activeServiceCard;
 let isServicePreviewPinned = false;
 let servicePreviewCloseTimer;
 let budgetDocuments = [];
+let budgetQuoteItems = [];
+let activeBudgetTool = "pdf";
 let isBudgetFocused = false;
 let isBudgetProcessing = false;
 let isBudgetSubmitting = false;
 let budgetFocusNoticeTimer;
-let budgetFocusReturnTarget;
 let budgetEntryArrivalTimer;
 let budgetEntryHighlightTimer;
+let activeWorkVideoIndex = 0;
+let isWorkVideoVisible = false;
+let workVideoSwitchTimer;
+let workVideoLoadVersion = 0;
+let pdfLibModulePromise;
 
 transitionLayer.className = "screen-transition-layer";
 transitionLayer.setAttribute("aria-hidden", "true");
@@ -204,6 +276,17 @@ function normalizeBudgetAmount(value) {
   return Math.max(1, Number.parseInt(value || "1", 10) || 1);
 }
 
+function normalizeBudgetInteger(value, minimum = 1, maximum = 5000) {
+  const parsed = Number.parseInt(value || String(minimum), 10);
+  return Math.min(Math.max(Number.isFinite(parsed) ? parsed : minimum, minimum), maximum);
+}
+
+function normalizeBudgetDecimal(value, minimum = 0.5, maximum = 28.7) {
+  const parsed = Number.parseFloat(String(value || minimum).replace(",", "."));
+  const normalized = Number.isFinite(parsed) ? parsed : minimum;
+  return Math.min(Math.max(Math.round(normalized * 10) / 10, minimum), maximum);
+}
+
 function getDocumentNotebookCount(documentItem) {
   const copies = normalizeBudgetAmount(documentItem.copies);
   return Math.min(normalizeBudgetAmount(documentItem.notebooks), copies);
@@ -215,6 +298,75 @@ function getBudgetUnitPrice(mode) {
 
 function getBudgetPageCount() {
   return budgetDocuments.reduce((total, documentItem) => total + documentItem.pages, 0);
+}
+
+function getBudgetQuoteItems(type) {
+  return budgetQuoteItems.filter((item) => item.type === type);
+}
+
+function getBudgetItemCount() {
+  return budgetDocuments.length + budgetQuoteItems.length;
+}
+
+function createBudgetItemKey(type) {
+  return `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function getBudgetRangeSize(control) {
+  const index = normalizeBudgetInteger(control?.value, 0, BUDGET_SIZE_STEPS.length - 1);
+  return BUDGET_SIZE_STEPS[index] || BUDGET_SIZE_STEPS[0];
+}
+
+function getBudgetSizeDimensions(size) {
+  const key = BUDGET_SIZE_STEPS.includes(String(size).toLowerCase())
+    ? String(size).toLowerCase()
+    : "5";
+  if (key === "a4") return { key, label: "A4", width: A4_WIDTH, height: A4_HEIGHT };
+  const value = Number(key);
+  return { key, label: `${value} × ${value} cm`, width: value, height: value };
+}
+
+function getBudgetStickerMaterial(value) {
+  const key = Object.hasOwn(BUDGET_STICKER_MATERIALS, value) ? value : "mate";
+  return { key, ...BUDGET_STICKER_MATERIALS[key] };
+}
+
+function calculateStickerLayout(width, height, quantity) {
+  const stickerWidth = normalizeBudgetDecimal(width, 0.5, A4_HEIGHT);
+  const stickerHeight = normalizeBudgetDecimal(height, 0.5, A4_HEIGHT);
+  const requested = normalizeBudgetInteger(quantity, 1, 5000);
+
+  const getLayout = (itemWidth, itemHeight, rotated) => {
+    const columns = Math.floor(A4_WIDTH / itemWidth);
+    const rows = Math.floor(A4_HEIGHT / itemHeight);
+    return {
+      columns: Math.max(0, columns),
+      rows: Math.max(0, rows),
+      perSheet: Math.max(0, columns * rows),
+      rotated,
+    };
+  };
+
+  const regular = getLayout(stickerWidth, stickerHeight, false);
+  const rotated = getLayout(stickerHeight, stickerWidth, true);
+  const best = rotated.perSheet > regular.perSheet ? rotated : regular;
+
+  return {
+    width: stickerWidth,
+    height: stickerHeight,
+    quantity: requested,
+    ...best,
+    sheets: best.perSheet > 0 ? Math.ceil(requested / best.perSheet) : 0,
+  };
+}
+
+function setBudgetRangeProgress(control) {
+  if (!control) return;
+  const minimum = Number(control.min) || 0;
+  const maximum = Number(control.max) || 100;
+  const current = Number(control.value) || minimum;
+  const progress = maximum === minimum ? 0 : ((current - minimum) / (maximum - minimum)) * 100;
+  control.style.setProperty("--range-progress", `${progress}%`);
 }
 
 function getDocumentSheetCount(documentItem) {
@@ -238,25 +390,45 @@ function getDocumentTotal(documentItem) {
 }
 
 function getBudgetTotals() {
-  return budgetDocuments.reduce((totals, documentItem) => {
+  const totals = budgetDocuments.reduce((result, documentItem) => {
     const sheets = getDocumentSheetCount(documentItem);
     const printTotal = getDocumentPrintTotal(documentItem);
     const bindingTotal = getDocumentBindingTotal(documentItem);
 
-    totals.pages += documentItem.pages || 0;
-    totals.sheets += sheets;
-    totals.printTotal += printTotal;
-    totals.bindingTotal += bindingTotal;
-    totals.total += printTotal + bindingTotal;
+    result.pages += documentItem.pages || 0;
+    result.sheets += sheets;
+    result.printTotal += printTotal;
+    result.bindingTotal += bindingTotal;
+    result.total += printTotal + bindingTotal;
 
-    return totals;
+    return result;
   }, {
     pages: 0,
     sheets: 0,
     printTotal: 0,
     bindingTotal: 0,
+    photoTotal: 0,
+    stickerTotal: 0,
+    pendingItems: 0,
     total: 0,
   });
+
+  budgetQuoteItems.forEach((item) => {
+    if (item.type === "photo") {
+      const format = BUDGET_PHOTO_FORMATS[item.size] || BUDGET_PHOTO_FORMATS[5];
+      const subtotal = format.price * normalizeBudgetInteger(item.quantity, 1, 500);
+      totals.photoTotal += subtotal;
+      totals.total += subtotal;
+    }
+
+    if (item.type === "sticker") {
+      const details = getStickerItemDetails(item);
+      totals.stickerTotal += details.total;
+      totals.total += details.total;
+    }
+  });
+
+  return totals;
 }
 
 function getBudgetDocumentKey(file) {
@@ -327,8 +499,216 @@ function renderBudgetDocuments() {
       </div>
     </li>
   `).join("");
+}
 
-  updateBudgetSessionUI();
+function getPhotoItemDetails(item) {
+  const format = BUDGET_PHOTO_FORMATS[item.size] || BUDGET_PHOTO_FORMATS[5];
+  const quantity = normalizeBudgetInteger(item.quantity, 1, 500);
+  const layout = calculateStickerLayout(format.width, format.height, quantity);
+  return {
+    format,
+    quantity,
+    ...layout,
+    total: format.price * quantity,
+  };
+}
+
+function getStickerItemDetails(item) {
+  const dimensions = getBudgetSizeDimensions(item.size ?? item.width);
+  const material = getBudgetStickerMaterial(item.material);
+  const layout = calculateStickerLayout(dimensions.width, dimensions.height, item.quantity);
+  return {
+    ...layout,
+    size: dimensions.key,
+    sizeLabel: dimensions.label,
+    material,
+    sheetPrice: material.price,
+    total: layout.sheets * material.price,
+  };
+}
+
+function renderBudgetQuoteItems() {
+  const photoItems = getBudgetQuoteItems("photo");
+  const stickerItems = getBudgetQuoteItems("sticker");
+
+  if (budgetPhotoList) {
+    budgetPhotoList.innerHTML = photoItems.map((item, index) => {
+      const details = getPhotoItemDetails(item);
+      return `
+        <li class="budget-text-item budget-text-item-photo">
+          <div class="budget-text-item-index">Foto ${index + 1}</div>
+          <div class="budget-text-item-copy">
+            <strong>${escapeHtml(details.format.label)} · ${details.quantity} unidad${details.quantity === 1 ? "" : "es"}</strong>
+            <span>${details.perSheet} por A4 · ${details.sheets} hoja${details.sheets === 1 ? "" : "s"} · ${formatBudgetCurrency(details.format.price)} por foto</span>
+          </div>
+          <strong class="budget-text-item-total">${formatBudgetCurrency(details.total)}</strong>
+          <button type="button" data-budget-remove-quote="${escapeHtml(item.key)}" aria-label="Quitar fotografías ${details.format.label}">×</button>
+        </li>`;
+    }).join("");
+  }
+
+  if (budgetStickerList) {
+    budgetStickerList.innerHTML = stickerItems.map((item, index) => {
+      const details = getStickerItemDetails(item);
+      return `
+        <li class="budget-text-item budget-text-item-sticker">
+          <div class="budget-text-item-index">Sticker ${index + 1}</div>
+          <div class="budget-text-item-copy">
+            <strong>${escapeHtml(details.sizeLabel)} · ${details.quantity} unidad${details.quantity === 1 ? "" : "es"}</strong>
+            <span>${escapeHtml(details.material.label)} · ${details.perSheet} por A4 · ${details.sheets} plancha${details.sheets === 1 ? "" : "s"} × ${formatBudgetCurrency(details.sheetPrice)}</span>
+          </div>
+          <strong class="budget-text-item-total">${formatBudgetCurrency(details.total)}</strong>
+          <button type="button" data-budget-remove-quote="${escapeHtml(item.key)}" aria-label="Quitar stickers ${escapeHtml(details.sizeLabel)}">×</button>
+        </li>`;
+    }).join("");
+  }
+
+  if (budgetToolPdfCount) budgetToolPdfCount.textContent = String(budgetDocuments.length);
+  if (budgetToolPhotoCount) budgetToolPhotoCount.textContent = String(photoItems.length);
+  if (budgetToolStickerCount) budgetToolStickerCount.textContent = String(stickerItems.length);
+}
+
+function renderBudgetPhotoPreview() {
+  if (!budgetPhotoPreview || !budgetPhotoSize || !budgetPhotoQuantity) return;
+  const selectedSize = getBudgetRangeSize(budgetPhotoSize);
+  const format = BUDGET_PHOTO_FORMATS[selectedSize] || BUDGET_PHOTO_FORMATS[5];
+  const quantity = normalizeBudgetInteger(budgetPhotoQuantity.value, 1, 500);
+  const layout = calculateStickerLayout(format.width, format.height, quantity);
+  if (budgetPhotoSizeOutput) budgetPhotoSizeOutput.textContent = format.label;
+  setBudgetRangeProgress(budgetPhotoSize);
+  budgetPhotoPreview.innerHTML = `
+    <div><span>Pedido</span><strong>${quantity} foto${quantity === 1 ? "" : "s"} · ${formatBudgetCurrency(format.price)} c/u</strong></div>
+    <div><span>Por hoja A4</span><strong>${layout.perSheet}</strong></div>
+    <div><span>Hojas necesarias</span><strong>${layout.sheets}</strong></div>
+    <div class="is-total"><span>Subtotal</span><strong>${formatBudgetCurrency(format.price * quantity)}</strong></div>`;
+}
+
+function renderBudgetStickerPreview() {
+  if (!budgetStickerPreview || !budgetStickerSize || !budgetStickerMaterial || !budgetStickerQuantity) return;
+  const size = getBudgetRangeSize(budgetStickerSize);
+  const dimensions = getBudgetSizeDimensions(size);
+  const material = getBudgetStickerMaterial(budgetStickerMaterial.value);
+  const layout = calculateStickerLayout(
+    dimensions.width,
+    dimensions.height,
+    budgetStickerQuantity.value,
+  );
+  const total = layout.sheets * material.price;
+  if (budgetStickerSizeOutput) budgetStickerSizeOutput.textContent = dimensions.label;
+  setBudgetRangeProgress(budgetStickerSize);
+
+  budgetStickerPreview.innerHTML = layout.perSheet > 0
+    ? `<div><span>Pedido</span><strong>${layout.quantity} sticker${layout.quantity === 1 ? "" : "s"} · ${escapeHtml(material.label)}</strong></div>
+       <div><span>Por hoja A4</span><strong>${layout.perSheet}</strong></div>
+       <div><span>Planchas necesarias</span><strong>${layout.sheets}</strong></div>
+       <div class="is-total"><span>Subtotal</span><strong>${formatBudgetCurrency(total)}</strong></div>`
+    : "<span>Ese tamaño no entra en el área imprimible A4.</span><strong>Revisá las medidas</strong>";
+  if (budgetAddSticker) budgetAddSticker.disabled = layout.perSheet < 1;
+}
+
+function getBudgetOverviewRows() {
+  const documentRows = budgetDocuments.map((documentItem, index) => ({
+    label: `PDF ${index + 1}`,
+    title: documentItem.name,
+    detail: `${documentItem.pages || 0} pág. · ${documentItem.mode === "color" ? "Color" : "B&N"} · ${documentItem.sides === "doble" ? "Doble faz" : "Simple faz"} · ${normalizeBudgetAmount(documentItem.copies)} copia${normalizeBudgetAmount(documentItem.copies) === 1 ? "" : "s"}`,
+    total: formatBudgetCurrency(getDocumentTotal(documentItem)),
+    pending: false,
+  }));
+
+  const quoteRows = budgetQuoteItems.map((item) => {
+    if (item.type === "photo") {
+      const details = getPhotoItemDetails(item);
+      return {
+        label: "Foto",
+        title: `${details.format.label} · ${details.quantity} unidad${details.quantity === 1 ? "" : "es"}`,
+        detail: `${details.perSheet} por A4 · ${details.sheets} hoja${details.sheets === 1 ? "" : "s"} · ${formatBudgetCurrency(details.format.price)} por foto`,
+        total: formatBudgetCurrency(details.total),
+        pending: false,
+      };
+    }
+
+    const details = getStickerItemDetails(item);
+    return {
+      label: "Sticker",
+      title: `${details.sizeLabel} · ${details.quantity} unidad${details.quantity === 1 ? "" : "es"}`,
+      detail: `${details.material.label} · ${details.perSheet} por A4 · ${details.sheets} plancha${details.sheets === 1 ? "" : "s"} × ${formatBudgetCurrency(details.sheetPrice)}`,
+      total: formatBudgetCurrency(details.total),
+      pending: false,
+    };
+  });
+
+  return [...documentRows, ...quoteRows];
+}
+
+function renderBudgetOverview() {
+  if (!budgetOverviewContent) return;
+  const rows = getBudgetOverviewRows();
+
+  if (!rows.length) {
+    budgetOverviewContent.innerHTML = `
+      <div class="budget-overview-heading">
+        <span>Nuevo presupuesto</span>
+        <strong>¿Qué trabajo querés cotizar?</strong>
+        <p>Elegí una categoría para abrir el configurador.</p>
+      </div>
+      <div class="budget-overview-options">
+        <button type="button" data-budget-overview-start="pdf"><span>PDF</span><strong>Impresiones y anillado</strong></button>
+        <button type="button" data-budget-overview-start="photo"><span>Foto</span><strong>Formatos fotográficos</strong></button>
+        <button type="button" data-budget-overview-start="sticker"><span>A4</span><strong>Stickers autoadhesivos</strong></button>
+      </div>`;
+    return;
+  }
+
+  const totals = getBudgetTotals();
+  budgetOverviewContent.innerHTML = `
+    <div class="budget-overview-heading">
+      <span>Presupuesto guardado</span>
+      <strong>${rows.length} trabajo${rows.length === 1 ? "" : "s"} cargado${rows.length === 1 ? "" : "s"}</strong>
+      <p>Resumen de solo lectura. Abrí el configurador para modificar cantidades o agregar trabajos.</p>
+    </div>
+    <ul class="budget-overview-list">
+      ${rows.map((row) => `
+        <li>
+          <span>${escapeHtml(row.label)}</span>
+          <div><strong>${escapeHtml(row.title)}</strong><small>${escapeHtml(row.detail)}</small></div>
+          <strong${row.pending ? ' class="is-pending"' : ""}>${escapeHtml(row.total)}</strong>
+        </li>`).join("")}
+    </ul>
+    <div class="budget-overview-total">
+      <div>
+        <span>Total calculado</span>
+        <strong>${formatBudgetCurrency(totals.total)}</strong>
+        <small>Incluye impresiones, fotos y planchas A4 autoadhesivas</small>
+      </div>
+      <button class="button button-primary" type="button" data-budget-overview-edit>Continuar editando</button>
+    </div>`;
+}
+
+function renderBudgetRunningList() {
+  if (!budgetRunning || !budgetRunningList) return;
+  const rows = getBudgetOverviewRows();
+  budgetRunning.hidden = rows.length === 0;
+  budgetRunningList.innerHTML = rows.map((row) => `
+    <li>
+      <span>${escapeHtml(row.label)}</span>
+      <div>
+        <strong>${escapeHtml(row.title)}</strong>
+        <small>${escapeHtml(row.detail)}</small>
+      </div>
+      <strong>${escapeHtml(row.total)}</strong>
+    </li>`).join("");
+}
+
+function setBudgetTool(tool) {
+  activeBudgetTool = ["pdf", "photo", "sticker"].includes(tool) ? tool : "pdf";
+  budgetToolButtons.forEach((button) => {
+    const isActive = button.dataset.budgetTool === activeBudgetTool;
+    button.setAttribute("aria-selected", String(isActive));
+    button.classList.toggle("is-active", isActive);
+  });
+  budgetToolPanels.forEach((panel) => {
+    panel.hidden = panel.dataset.budgetToolPanel !== activeBudgetTool;
+  });
 }
 
 function getBudgetDocumentMeta(documentItem) {
@@ -370,18 +750,41 @@ function getBudgetDraft() {
       binding: documentItem.binding,
       notebooks: documentItem.binding ? getDocumentNotebookCount(documentItem) : 0,
     })),
+    quoteItems: budgetQuoteItems.map((item) => {
+      if (item.type === "photo") {
+        return {
+          type: "photo",
+          size: item.size,
+          quantity: normalizeBudgetInteger(item.quantity, 1, 500),
+        };
+      }
+
+      const dimensions = getBudgetSizeDimensions(item.size ?? item.width);
+      const material = getBudgetStickerMaterial(item.material);
+      return {
+          type: "sticker",
+          size: dimensions.key,
+          width: dimensions.width,
+          height: dimensions.height,
+          material: material.key,
+          quantity: normalizeBudgetInteger(item.quantity, 1, 5000),
+        };
+    }),
   };
 }
 
 function updateBudgetWhatsapp() {
   if (!budgetWhatsapp) return;
 
-  budgetWhatsapp.disabled = isBudgetSubmitting;
+  const hasItems = getBudgetItemCount() > 0;
+  budgetWhatsapp.disabled = isBudgetSubmitting || !hasItems;
   budgetWhatsapp.textContent = isBudgetSubmitting
-    ? "Guardando pedido..."
+    ? budgetDocuments.length ? "Guardando pedido..." : "Abriendo WhatsApp..."
     : budgetDocuments.length
       ? "Crear pedido y abrir WhatsApp"
-      : "Cargar primer PDF";
+      : hasItems
+        ? "Abrir WhatsApp con presupuesto"
+        : "Agregá un trabajo para continuar";
 }
 
 function queueBudgetEntryHighlight() {
@@ -390,26 +793,32 @@ function queueBudgetEntryHighlight() {
   window.clearTimeout(budgetEntryArrivalTimer);
   window.clearTimeout(budgetEntryHighlightTimer);
   budgetEntryArrivalTimer = window.setTimeout(() => {
-    budgetSection.classList.remove("is-budget-entry");
-    void budgetSection.offsetWidth;
-    budgetSection.classList.add("is-budget-entry");
-    budgetEntryHighlightTimer = window.setTimeout(() => {
-      budgetSection.classList.remove("is-budget-entry");
-    }, 1700);
-  }, prefersReducedMotion ? 0 : 920);
+    setBudgetTool("pdf");
+    setBudgetFocus(true);
+  }, prefersReducedMotion ? 0 : 980);
 }
 
 function updateBudgetEstimate() {
-  if (!budgetPages || !budgetSheets || !budgetTotal) return;
+  if (!budgetTotal) return;
 
   const totals = getBudgetTotals();
+  const photoItems = getBudgetQuoteItems("photo");
+  const stickerItems = getBudgetQuoteItems("sticker");
 
-  if (budgetDocumentsCount) budgetDocumentsCount.textContent = budgetDocuments.length || "0";
-  budgetPages.textContent = totals.pages || "0";
-  budgetSheets.textContent = totals.sheets || "0";
-  if (budgetBindingTotal) budgetBindingTotal.textContent = formatBudgetCurrency(totals.bindingTotal);
+  if (budgetItemsCount) budgetItemsCount.textContent = String(getBudgetItemCount());
+  if (budgetDocumentsCount) budgetDocumentsCount.textContent = String(budgetDocuments.length);
+  if (budgetPhotosCount) budgetPhotosCount.textContent = String(photoItems.length);
+  if (budgetStickersCount) budgetStickersCount.textContent = String(stickerItems.length);
   budgetTotal.textContent = formatBudgetCurrency(totals.total);
-  updateBudgetWhatsapp(totals);
+  if (budgetTotalNote) {
+    const a4Sheets = stickerItems.reduce((sum, item) => sum + getStickerItemDetails(item).sheets, 0);
+    budgetTotalNote.textContent = a4Sheets
+      ? `${a4Sheets} plancha${a4Sheets === 1 ? "" : "s"} A4 autoadhesiva${a4Sheets === 1 ? "" : "s"} incluida${a4Sheets === 1 ? "" : "s"}`
+      : "";
+  }
+  renderBudgetOverview();
+  renderBudgetRunningList();
+  updateBudgetWhatsapp();
 }
 
 function updateBudgetDocument(key, values) {
@@ -425,20 +834,46 @@ function updateBudgetDocument(key, values) {
 
 function updateBudgetSessionUI() {
   const hasDocuments = budgetDocuments.length > 0;
-  const hasSession = hasDocuments || isBudgetProcessing;
+  const itemCount = getBudgetItemCount();
+  const hasItems = itemCount > 0;
+  const hasSession = isBudgetFocused || isBudgetProcessing;
 
   budgetForm?.classList.toggle("has-documents", hasDocuments);
+  budgetForm?.classList.toggle("has-items", hasItems);
+  budgetForm?.classList.toggle("is-editing", isBudgetFocused);
+  if (budgetOverview) budgetOverview.hidden = isBudgetFocused;
+  if (budgetEditor) budgetEditor.hidden = !isBudgetFocused;
+  if (budgetSummary) budgetSummary.hidden = !isBudgetFocused;
+  if (budgetDelivery) budgetDelivery.hidden = !isBudgetFocused || !hasItems;
+  if (budgetStatus) budgetStatus.hidden = !isBudgetFocused;
+  if (budgetWhatsapp) budgetWhatsapp.hidden = !isBudgetFocused;
+  if (budgetConsentBox) budgetConsentBox.hidden = !hasDocuments;
+
+  if (budgetDeliveryKicker) budgetDeliveryKicker.textContent = hasDocuments ? "Entrega segura" : "Continuar por WhatsApp";
+  if (budgetDeliveryTitle) {
+    budgetDeliveryTitle.textContent = hasDocuments
+      ? "Pedido privado con tus PDFs"
+      : "Presupuesto listo para enviar";
+  }
+  if (budgetDeliveryDescription) {
+    budgetDeliveryDescription.textContent = hasDocuments
+      ? budgetQuoteItems.length
+        ? "Los PDFs se guardarán durante 7 días. Las imágenes de fotos y stickers se envían luego por WhatsApp."
+        : "Los PDFs se guardarán temporalmente durante 7 días para que la imprenta pueda descargarlos."
+      : "Las imágenes no se cargan en la web: las enviarás directamente en la conversación con la imprenta.";
+  }
+
   if (!budgetSession) return;
 
   budgetSession.hidden = !hasSession;
-  budgetSession.classList.toggle("is-paused", hasDocuments && !isBudgetFocused);
+  budgetSession.classList.remove("is-paused");
 
   if (budgetSessionStatus) {
     budgetSessionStatus.textContent = isBudgetSubmitting
-      ? "Guardando pedido"
+      ? hasDocuments ? "Guardando pedido" : "Preparando WhatsApp"
       : isBudgetProcessing
       ? "Analizando PDFs"
-      : isBudgetFocused ? "Presupuesto en curso" : "Presupuesto pausado";
+      : "Configurando presupuesto";
   }
 
   if (budgetSessionDetail) {
@@ -446,22 +881,20 @@ function updateBudgetSessionUI() {
       ? "No cierres esta pantalla"
       : isBudgetProcessing && !hasDocuments
       ? "Preparando tus archivos"
-      : `${budgetDocuments.length} PDF${budgetDocuments.length === 1 ? "" : "s"} cargado${budgetDocuments.length === 1 ? "" : "s"}`;
+      : hasItems
+      ? `${itemCount} trabajo${itemCount === 1 ? "" : "s"} listo${itemCount === 1 ? "" : "s"} para editar`
+      : "Elegí PDFs, fotos o stickers";
   }
 
   if (budgetSessionAction) {
     budgetSessionAction.disabled = isBudgetSubmitting;
-    budgetSessionAction.textContent = isBudgetSubmitting ? "Guardando" : isBudgetFocused ? "Salir" : "Continuar";
-    budgetSessionAction.setAttribute(
-      "aria-label",
-      isBudgetFocused ? "Salir del modo presupuesto" : "Continuar el presupuesto"
-    );
+    budgetSessionAction.textContent = isBudgetSubmitting ? "Guardando" : "Salir";
+    budgetSessionAction.setAttribute("aria-label", "Salir del modo presupuesto");
   }
 }
 
 function setBudgetFocus(active, options = {}) {
-  const canActivate = budgetDocuments.length > 0 || isBudgetProcessing;
-  const nextState = Boolean(active && canActivate);
+  const nextState = Boolean(active);
   if (nextState === isBudgetFocused) {
     updateBudgetSessionUI();
     return;
@@ -476,22 +909,18 @@ function setBudgetFocus(active, options = {}) {
   });
 
   if (isBudgetFocused) {
-    budgetFocusReturnTarget = document.activeElement instanceof HTMLElement
-      ? document.activeElement
-      : undefined;
     budgetSection?.scrollTo({ top: 0, behavior: "auto" });
+    budgetForm?.scrollTo({ top: 0, behavior: "auto" });
     if (options.focusSession) window.requestAnimationFrame(() => budgetSessionAction?.focus());
   } else if (options.restoreFocus !== false) {
     window.requestAnimationFrame(() => {
-      if (budgetSessionAction && budgetSession && !budgetSession.hidden) {
-        budgetSessionAction.focus();
-      } else {
-        budgetFocusReturnTarget?.focus?.();
-      }
+      const overviewAction = budgetOverview?.querySelector("[data-budget-overview-edit], [data-budget-overview-start]");
+      overviewAction?.focus?.({ preventScroll: true });
     });
   }
 
   updateBudgetSessionUI();
+  renderBudgetOverview();
 }
 
 function signalBudgetFocusBoundary() {
@@ -506,15 +935,17 @@ function signalBudgetFocusBoundary() {
   }, 760);
 }
 
-function canScrollBudgetDocumentList(target, direction) {
-  const documentList = target.closest?.(".budget-document-list");
-  if (!documentList) return false;
+function canScrollBudgetFocus(target, direction) {
+  if (!(target instanceof Element)) return false;
+  const candidates = [
+    target.closest(".budget-document-list"),
+    target.closest(".budget-editor"),
+    target.closest(".budget-panel"),
+  ].filter(Boolean);
 
-  if (direction > 0) {
-    return documentList.scrollTop + documentList.clientHeight < documentList.scrollHeight - 2;
-  }
-
-  return documentList.scrollTop > 2;
+  return candidates.some((element) => direction > 0
+    ? element.scrollTop + element.clientHeight < element.scrollHeight - 2
+    : element.scrollTop > 2);
 }
 
 function syncBudgetNotebookControl(key) {
@@ -600,10 +1031,32 @@ async function addBudgetFiles(fileList) {
     if (budgetProgress) budgetProgress.hidden = true;
     budgetDelivery?.classList.remove("is-consent-required");
     renderBudgetDocuments();
+    renderBudgetQuoteItems();
     window.requestAnimationFrame(() => {
       const newestDocument = budgetDocumentList?.lastElementChild;
       if (budgetDocumentList && newestDocument instanceof HTMLElement) {
-        budgetDocumentList.scrollTop = newestDocument.offsetTop - budgetDocumentList.offsetTop;
+        const listCanScroll = budgetDocumentList.scrollHeight > budgetDocumentList.clientHeight + 2;
+
+        if (listCanScroll) {
+          budgetDocumentList.scrollTop = newestDocument.offsetTop - budgetDocumentList.offsetTop;
+        } else if (budgetForm) {
+          const panelRect = budgetForm.getBoundingClientRect();
+          const documentRect = newestDocument.getBoundingClientRect();
+          const sessionOffset = budgetSession?.offsetHeight || 0;
+
+          budgetForm.scrollTo({
+            top: budgetForm.scrollTop + documentRect.top - panelRect.top - sessionOffset - 18,
+            behavior: prefersReducedMotion ? "auto" : "smooth",
+          });
+        }
+
+        newestDocument.classList.add("is-ready-to-edit");
+
+        if (window.innerWidth > 620) {
+          newestDocument.querySelector("select")?.focus({ preventScroll: true });
+        }
+
+        window.setTimeout(() => newestDocument.classList.remove("is-ready-to-edit"), 1200);
       }
     });
 
@@ -612,20 +1065,81 @@ async function addBudgetFiles(fileList) {
       const skippedCount = incomingFiles.length - filesToAdd.length;
       const prefix = skippedCount > 0 ? `Se agregaron ${filesToAdd.length} PDFs válidos. ` : "";
       budgetStatus.textContent = pageCount > 0
-        ? `${prefix}Presupuesto actualizado. Al finalizar crearemos el pedido privado y abriremos WhatsApp.`
-        : `${prefix}El servidor verificará las páginas al guardar el pedido.`;
+        ? `${prefix}Configurá impresión, caras, copias y anillado en cada tarjeta. El total se actualiza al instante.`
+        : `${prefix}Configurá el trabajo; el servidor verificará las páginas al guardar el pedido.`;
     }
   } catch {
     if (budgetStatus) budgetStatus.textContent = "No pudimos leer uno de los PDFs. Probá con otro archivo o consultanos por WhatsApp.";
   }
 
   isBudgetProcessing = false;
-  if (budgetDocuments.length) {
+  if (getBudgetItemCount() || isBudgetFocused) {
     updateBudgetSessionUI();
   } else {
     setBudgetFocus(false, { restoreFocus: false });
   }
   updateBudgetEstimate();
+}
+
+function syncBudgetPhotoItem() {
+  if (!budgetPhotoSize || !budgetPhotoQuantity) return;
+  const selectedSize = getBudgetRangeSize(budgetPhotoSize);
+  const size = BUDGET_PHOTO_FORMATS[selectedSize] ? selectedSize : "5";
+  const quantity = normalizeBudgetInteger(budgetPhotoQuantity.value, 1, 500);
+  const currentPhoto = budgetQuoteItems.find((item) => item.type === "photo");
+  const nextPhoto = {
+    key: currentPhoto?.key || createBudgetItemKey("photo"),
+    type: "photo",
+    size,
+    quantity,
+  };
+
+  budgetQuoteItems = currentPhoto
+    ? budgetQuoteItems.map((item) => item.key === currentPhoto.key ? nextPhoto : item)
+    : [...budgetQuoteItems, nextPhoto];
+  renderBudgetQuoteItems();
+  renderBudgetPhotoPreview();
+  updateBudgetEstimate();
+  updateBudgetSessionUI();
+  if (budgetStatus) budgetStatus.textContent = "Cotización fotográfica actualizada. Las imágenes se adjuntarán directamente en WhatsApp.";
+}
+
+function addBudgetStickerItem() {
+  if (!budgetStickerSize || !budgetStickerMaterial || !budgetStickerQuantity) return;
+  const size = getBudgetRangeSize(budgetStickerSize);
+  const dimensions = getBudgetSizeDimensions(size);
+  const material = getBudgetStickerMaterial(budgetStickerMaterial.value);
+  const layout = calculateStickerLayout(
+    dimensions.width,
+    dimensions.height,
+    budgetStickerQuantity.value,
+  );
+  if (layout.perSheet < 1) {
+    if (budgetStatus) budgetStatus.textContent = "Revisá las medidas: el sticker debe entrar en el área imprimible A4.";
+    return;
+  }
+
+  budgetQuoteItems = [...budgetQuoteItems, {
+    key: createBudgetItemKey("sticker"),
+    type: "sticker",
+    size,
+    material: material.key,
+    quantity: layout.quantity,
+  }];
+  renderBudgetQuoteItems();
+  renderBudgetStickerPreview();
+  updateBudgetEstimate();
+  updateBudgetSessionUI();
+  if (budgetStatus) budgetStatus.textContent = `Stickers agregados en ${material.label.toLowerCase()}. Las planchas A4 ya están incluidas en el total.`;
+  budgetStickerList?.lastElementChild?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "nearest" });
+}
+
+function removeBudgetQuoteItem(key) {
+  budgetQuoteItems = budgetQuoteItems.filter((item) => item.key !== key);
+  renderBudgetQuoteItems();
+  updateBudgetEstimate();
+  updateBudgetSessionUI();
+  if (budgetStatus) budgetStatus.textContent = "Trabajo quitado. El resumen se actualizó.";
 }
 
 function detectPdfPagesFromText(text) {
@@ -641,8 +1155,19 @@ function detectPdfPagesFromText(text) {
 
 async function countPdfPages(file) {
   const buffer = await file.arrayBuffer();
-  const text = new TextDecoder("latin1").decode(buffer);
-  return detectPdfPagesFromText(text);
+  try {
+    pdfLibModulePromise ||= import("/vendor/pdf-lib.esm.min.js");
+    const { PDFDocument } = await pdfLibModulePromise;
+    const documentPdf = await PDFDocument.load(buffer, {
+      ignoreEncryption: true,
+      throwOnInvalidObject: false,
+      updateMetadata: false,
+    });
+    return documentPdf.getPageCount();
+  } catch {
+    const text = new TextDecoder("latin1").decode(buffer);
+    return detectPdfPagesFromText(text);
+  }
 }
 
 function setBudgetProgress(value, label, detail) {
@@ -705,6 +1230,36 @@ function uploadBudgetPdf(uploadUrl, token, file, onProgress) {
   });
 }
 
+function buildTextBudgetWhatsAppMessage() {
+  const itemLines = budgetQuoteItems.map((item, index) => {
+    if (item.type === "photo") {
+      const details = getPhotoItemDetails(item);
+      return [
+        `Foto ${index + 1}: ${details.format.label} · ${details.quantity} unidad${details.quantity === 1 ? "" : "es"}`,
+        `${details.perSheet} por hoja A4 · ${details.sheets} hoja${details.sheets === 1 ? "" : "s"}`,
+        `Subtotal: ${formatBudgetCurrency(details.total)}`,
+      ].join("\n");
+    }
+
+    const details = getStickerItemDetails(item);
+    return [
+      `Stickers ${index + 1}: ${details.sizeLabel} · ${details.quantity} unidad${details.quantity === 1 ? "" : "es"}`,
+      `${details.material.label} · ${details.perSheet} por plancha A4 · ${details.sheets} plancha${details.sheets === 1 ? "" : "s"}`,
+      `${formatBudgetCurrency(details.sheetPrice)} por plancha A4`,
+      `Subtotal: ${formatBudgetCurrency(details.total)}`,
+    ].join("\n");
+  });
+  const totals = getBudgetTotals();
+
+  return [
+    "Hola Impresiones GG, preparé este presupuesto desde la web.",
+    "*Presupuesto de fotos y stickers*",
+    itemLines.join("\n\n"),
+    `*Total calculado: ${formatBudgetCurrency(totals.total)}*`,
+    "Voy a enviar las imágenes para diseñar o imprimir por este chat.",
+  ].filter(Boolean).join("\n\n");
+}
+
 async function createAndUploadBudgetOrder() {
   setBudgetProgress(2, "Creando pedido", "Preparando un espacio privado para tus archivos...");
   const createResponse = await fetch("/api/presupuestos", {
@@ -754,18 +1309,26 @@ async function createAndUploadBudgetOrder() {
 async function handleBudgetStart() {
   if (isBudgetSubmitting) return;
 
-  if (!budgetDocuments.length) {
-    if (budgetStatus) budgetStatus.textContent = "Cargá al menos un PDF para iniciar el presupuesto.";
-    budgetFile?.click();
+  if (!getBudgetItemCount()) {
+    if (budgetStatus) budgetStatus.textContent = "Agregá al menos un trabajo para continuar.";
     return;
   }
 
-  if (!budgetConsent?.checked) {
+  if (budgetDocuments.length && !budgetConsent?.checked) {
     budgetDelivery?.classList.remove("is-consent-required");
     void budgetDelivery?.offsetWidth;
     budgetDelivery?.classList.add("is-consent-required");
     budgetConsent?.focus();
     if (budgetStatus) budgetStatus.textContent = "Confirmá la carga temporal para poder crear el pedido privado.";
+    return;
+  }
+
+  if (!budgetDocuments.length) {
+    setBudgetSubmitting(true);
+    if (budgetStatus) budgetStatus.textContent = "Abriendo WhatsApp con el presupuesto listo para enviar.";
+    const whatsappUrl = `https://wa.me/${BUDGET_WHATSAPP_NUMBER}?text=${encodeURIComponent(buildTextBudgetWhatsAppMessage())}`;
+    setBudgetSubmitting(false);
+    window.location.assign(whatsappUrl);
     return;
   }
 
@@ -796,7 +1359,12 @@ function initBudgetCalculator() {
   });
 
   renderBudgetDocuments();
+  renderBudgetQuoteItems();
+  renderBudgetPhotoPreview();
+  renderBudgetStickerPreview();
+  setBudgetTool(activeBudgetTool);
   updateBudgetEstimate();
+  updateBudgetSessionUI();
 
   budgetWhatsapp?.addEventListener("click", handleBudgetStart);
   budgetConsent?.addEventListener("change", () => {
@@ -806,7 +1374,44 @@ function initBudgetCalculator() {
     }
   });
   budgetSessionAction?.addEventListener("click", () => {
-    setBudgetFocus(!isBudgetFocused, { focusSession: !isBudgetFocused });
+    setBudgetFocus(false);
+  });
+
+  budgetOverview?.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+    const startButton = event.target.closest("[data-budget-overview-start]");
+    const editButton = event.target.closest("[data-budget-overview-edit]");
+    if (!startButton && !editButton) return;
+
+    if (startButton) setBudgetTool(startButton.dataset.budgetOverviewStart);
+    setBudgetFocus(true);
+  });
+
+  budgetToolButtons.forEach((button, index) => {
+    button.addEventListener("click", () => setBudgetTool(button.dataset.budgetTool));
+    button.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      event.preventDefault();
+      const direction = event.key === "ArrowRight" ? 1 : -1;
+      const nextIndex = (index + direction + budgetToolButtons.length) % budgetToolButtons.length;
+      const nextButton = budgetToolButtons[nextIndex];
+      setBudgetTool(nextButton.dataset.budgetTool);
+      nextButton.focus();
+    });
+  });
+
+  [budgetPhotoSize, budgetPhotoQuantity].forEach((control) => {
+    control?.addEventListener("input", syncBudgetPhotoItem);
+  });
+  [budgetStickerSize, budgetStickerMaterial, budgetStickerQuantity].forEach((control) => {
+    control?.addEventListener("input", renderBudgetStickerPreview);
+    control?.addEventListener("change", renderBudgetStickerPreview);
+  });
+  budgetAddSticker?.addEventListener("click", addBudgetStickerItem);
+  budgetEditor?.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+    const removeButton = event.target.closest("[data-budget-remove-quote]");
+    if (removeButton) removeBudgetQuoteItem(removeButton.dataset.budgetRemoveQuote);
   });
 
   budgetFile?.addEventListener("change", async () => {
@@ -825,11 +1430,14 @@ function initBudgetCalculator() {
     if (budgetProgress) budgetProgress.hidden = true;
     budgetDelivery?.classList.remove("is-consent-required");
     renderBudgetDocuments();
-    if (!budgetDocuments.length) setBudgetFocus(false, { restoreFocus: false });
+    renderBudgetQuoteItems();
+    updateBudgetSessionUI();
     if (budgetStatus) {
       budgetStatus.textContent = budgetDocuments.length
         ? "PDF quitado. El presupuesto final se actualizó."
-        : "Subí uno o más PDFs para detectar páginas y calcular el presupuesto.";
+        : budgetQuoteItems.length
+          ? "PDF quitado. Los trabajos de texto siguen guardados."
+          : "Presupuesto vacío. Elegí PDFs, fotografías o stickers para continuar.";
     }
     updateBudgetEstimate();
   });
@@ -1620,7 +2228,7 @@ function scheduleScreenSettle() {
 function handleScreenWheel(event) {
   if (isBudgetFocused) {
     const direction = event.deltaY > 0 ? 1 : -1;
-    if (canScrollBudgetDocumentList(event.target, direction)) return;
+    if (canScrollBudgetFocus(event.target, direction)) return;
 
     event.preventDefault();
     signalBudgetFocusBoundary();
@@ -1678,7 +2286,7 @@ function handleScreenTouchMove(event) {
   if (isBudgetFocused) {
     const touchCurrentY = event.touches[0]?.clientY || 0;
     const direction = touchStartY - touchCurrentY > 0 ? 1 : -1;
-    if (canScrollBudgetDocumentList(event.target, direction)) return;
+    if (canScrollBudgetFocus(event.target, direction)) return;
 
     event.preventDefault();
     signalBudgetFocusBoundary();
@@ -1814,9 +2422,93 @@ paletteSwatches.forEach((swatch) => {
   swatch.addEventListener("click", () => setBackgroundOption(swatch.dataset.bgOption));
 });
 
+function updateWorkVideoControls() {
+  if (workVideoCount) {
+    workVideoCount.textContent = `${String(activeWorkVideoIndex + 1).padStart(2, "0")} / ${String(workVideos.length).padStart(2, "0")}`;
+  }
+  if (workVideoTitle) workVideoTitle.textContent = workVideos[activeWorkVideoIndex].title;
+  workVideoSequence?.querySelectorAll("button").forEach((button, index) => {
+    const isActive = index === activeWorkVideoIndex;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+function showWorkVideo(nextIndex, options = {}) {
+  if (!workVideo || !workVideoSource || !workVideoPlayer || !workVideos.length) return;
+  const normalizedIndex = (nextIndex + workVideos.length) % workVideos.length;
+  if (normalizedIndex === activeWorkVideoIndex && !options.force) {
+    if (isWorkVideoVisible) workVideo.play().catch(() => {});
+    return;
+  }
+
+  activeWorkVideoIndex = normalizedIndex;
+  const item = workVideos[activeWorkVideoIndex];
+  const loadVersion = ++workVideoLoadVersion;
+  window.clearTimeout(workVideoSwitchTimer);
+  workVideo.pause();
+  workVideoPlayer.classList.add("is-changing");
+  updateWorkVideoControls();
+
+  const swapSource = () => {
+    if (loadVersion !== workVideoLoadVersion) return;
+    workVideoSource.src = item.src;
+    workVideo.poster = item.poster;
+    workVideo.setAttribute("aria-label", item.title);
+    workVideo.load();
+
+    let hasRevealed = false;
+    const revealVideo = () => {
+      if (hasRevealed || loadVersion !== workVideoLoadVersion) return;
+      hasRevealed = true;
+      workVideoPlayer.classList.remove("is-changing");
+      workVideoPlayer.classList.add("is-arriving");
+      window.setTimeout(() => workVideoPlayer.classList.remove("is-arriving"), 420);
+      if (isWorkVideoVisible) workVideo.play().catch(() => {});
+    };
+
+    workVideo.addEventListener("loadeddata", revealVideo, { once: true });
+    window.setTimeout(revealVideo, 900);
+  };
+
+  workVideoSwitchTimer = window.setTimeout(swapSource, prefersReducedMotion ? 0 : 220);
+}
+
+function initWorkVideoPlayer() {
+  if (!workVideoPlayer || !workVideo || !workVideoSequence || !workVideos.length) return;
+
+  workVideoSequence.innerHTML = workVideos.map((item, index) => `
+    <button type="button" aria-label="Ver ${escapeHtml(item.title)}" aria-pressed="${index === 0}">
+      <span>${String(index + 1).padStart(2, "0")}</span>
+      <strong>${escapeHtml(item.title)}</strong>
+    </button>`).join("");
+  workVideoSequence.querySelectorAll("button").forEach((button, index) => {
+    button.addEventListener("click", () => showWorkVideo(index));
+  });
+  workVideoPrevious?.addEventListener("click", () => showWorkVideo(activeWorkVideoIndex - 1));
+  workVideoNext?.addEventListener("click", () => showWorkVideo(activeWorkVideoIndex + 1));
+  workVideo.addEventListener("ended", () => showWorkVideo(activeWorkVideoIndex + 1));
+  updateWorkVideoControls();
+
+  const workVideoObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      isWorkVideoVisible = entry.isIntersecting;
+      workVideoPlayer.classList.toggle("is-in-view", isWorkVideoVisible);
+      if (isWorkVideoVisible) {
+        workVideo.play().catch(() => {});
+      } else {
+        workVideo.pause();
+      }
+    });
+  }, { threshold: 0.42 });
+
+  workVideoObserver.observe(workVideoPlayer);
+}
+
 syncPaletteWithSystemTone();
 initHomeIntro();
 initBudgetCalculator();
+initWorkVideoPlayer();
 
 if (colorSchemeQuery.addEventListener) {
   colorSchemeQuery.addEventListener("change", syncPaletteWithSystemTone);
@@ -1860,26 +2552,4 @@ if (revealItems.length) {
   );
 
   revealItems.forEach((item) => revealObserver.observe(item));
-}
-
-if (autoplayVideos.length) {
-  const videoObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        const video = entry.target;
-        const shell = video.closest(".work-card");
-
-        if (entry.isIntersecting) {
-          shell?.classList.add("is-in-view");
-          video.play().catch(() => {});
-        } else {
-          shell?.classList.remove("is-in-view");
-          video.pause();
-        }
-      });
-    },
-    { threshold: 0.45 }
-  );
-
-  autoplayVideos.forEach((video) => videoObserver.observe(video));
 }

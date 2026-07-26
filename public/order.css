@@ -132,7 +132,8 @@ a {
 }
 
 .order-grand-total span,
-.order-grand-total strong {
+.order-grand-total strong,
+.order-grand-total small {
   display: block;
 }
 
@@ -142,6 +143,17 @@ a {
   font-size: clamp(1.7rem, 4vw, 3rem);
   line-height: 1;
   overflow-wrap: anywhere;
+}
+
+.order-grand-total small {
+  margin-top: 6px;
+  color: var(--pink);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.order-price-pending {
+  color: var(--pink);
 }
 
 .order-summary {

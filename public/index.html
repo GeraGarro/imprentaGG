@@ -111,7 +111,7 @@
 
                 <div class="hero-actions" aria-label="Acciones principales">
                     <a class="button button-primary button-budget button-budget-entry" href="#presupuesto" data-budget-entry>
-                        Cotizar mis PDFs
+                        Armar presupuesto
                     </a>
                     <a class="button button-secondary button-map" href="https://www.google.com/maps/place/Impresiones+GG+Digital+Fix/@-33.3086613,-66.3183423,17z/data=!3m1!4b1!4m6!3m5!1s0x95d43db84d1b516d:0xed5a696c1b1548e7!8m2!3d-33.3086658!4d-66.3157674!16s%2Fg%2F11mdgz13s_?entry=ttu&amp;g_ep=EgoyMDI2MDcyMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noreferrer">
                         Cómo llegar
@@ -163,122 +163,176 @@
         <section class="work-strip" id="trabajos" aria-labelledby="trabajos-title" data-screen>
             <div class="section-heading" data-reveal>
                 <p class="eyebrow">Trabajos realizados</p>
-                <h2 id="trabajos-title">Trabajos reales para mirar de cerca.</h2>
+                <h2 id="trabajos-title">Un trabajo por vez, con todos sus detalles.</h2>
             </div>
 
-            <div class="work-grid">
-                <article class="work-card" data-reveal>
-                    <video data-autoplay-video muted loop playsinline preload="metadata" poster="assets/trabajos/movie/trabajo-01-poster.webp">
-                        <source src="assets/trabajos/movie/trabajo-01-web.webm" type="video/webm">
+            <div class="work-player" data-work-player data-reveal>
+                <div class="work-player-stage">
+                    <video data-work-video muted playsinline controls preload="metadata" poster="assets/trabajos/movie/trabajo-01-poster.webp" aria-label="Personalizados">
+                        <source data-work-video-source src="assets/trabajos/movie/trabajo-01-web.webm" type="video/webm">
                     </video>
-                    <div class="work-card-meta">
-                        <span>01</span>
-                        <h3>Personalizados</h3>
+                    <div class="work-player-meta" aria-live="polite">
+                        <span data-work-video-count>01 / 06</span>
+                        <h3 data-work-video-title>Anillados</h3>
                     </div>
-                </article>
-                <article class="work-card" data-reveal>
-                    <video data-autoplay-video muted loop playsinline preload="metadata" poster="assets/trabajos/movie/trabajo-02-poster.webp">
-                        <source src="assets/trabajos/movie/trabajo-02-web.webm" type="video/webm">
-                    </video>
-                    <div class="work-card-meta">
-                        <span>02</span>
-                        <h3>Cortes</h3>
-                    </div>
-                </article>
-                <article class="work-card" data-reveal>
-                    <video data-autoplay-video muted loop playsinline preload="metadata" poster="assets/trabajos/movie/trabajo-03-poster.webp">
-                        <source src="assets/trabajos/movie/trabajo-03-web.webm" type="video/webm">
-                    </video>
-                    <div class="work-card-meta">
-                        <span>03</span>
-                        <h3>Armado</h3>
-                    </div>
-                </article>
-                <article class="work-card" data-reveal>
-                    <video data-autoplay-video muted loop playsinline preload="metadata" poster="assets/trabajos/movie/trabajo-04-poster.webp">
-                        <source src="assets/trabajos/movie/trabajo-04-web.webm" type="video/webm">
-                    </video>
-                    <div class="work-card-meta">
-                        <span>04</span>
-                        <h3>Souvenirs</h3>
-                    </div>
-                </article>
-                <article class="work-card" data-reveal>
-                    <video data-autoplay-video muted loop playsinline preload="metadata" poster="assets/trabajos/movie/trabajo-05-poster.webp">
-                        <source src="assets/trabajos/movie/trabajo-05-web.webm" type="video/webm">
-                    </video>
-                    <div class="work-card-meta">
-                        <span>05</span>
-                        <h3>Diseño</h3>
-                    </div>
-                </article>
-                <article class="work-card" data-reveal>
-                    <video data-autoplay-video muted loop playsinline preload="metadata" poster="assets/trabajos/movie/trabajo-06-poster.webp">
-                        <source src="assets/trabajos/movie/trabajo-06-web.webm" type="video/webm">
-                    </video>
-                    <div class="work-card-meta">
-                        <span>06</span>
-                        <h3>Entrega final</h3>
-                    </div>
-                </article>
+                </div>
+                <div class="work-player-navigation">
+                    <button type="button" data-work-video-previous aria-label="Ver video anterior" title="Video anterior">&#8249;</button>
+                    <div class="work-player-sequence" data-work-video-sequence aria-label="Videos de trabajos realizados"></div>
+                    <button type="button" data-work-video-next aria-label="Ver video siguiente" title="Video siguiente">&#8250;</button>
+                </div>
             </div>
         </section>
 
         <section class="contact-band budget-section" id="presupuesto" aria-label="Presupuesto de impresiones" data-reveal data-screen>
             <div class="contact-copy">
-                <p class="eyebrow">Cotizador de impresiones</p>
-                <h2>Cotizá cada PDF y obtené el total al instante.</h2>
-                <p class="contact-detail">Configurá color, caras, copias y anillado por archivo. Al finalizar crearemos un pedido privado con los PDFs y abriremos WhatsApp con todo el detalle listo para enviar.</p>
+                <p class="eyebrow">Cotizador online</p>
+                <h2>Impresiones, fotos y stickers en un solo presupuesto.</h2>
+                <p class="contact-detail">Los PDFs se calculan y adjuntan de forma privada. Las fotos y los stickers se detallan por texto para continuar el pedido por WhatsApp.</p>
             </div>
             <form class="budget-panel" data-budget-form>
                 <div class="budget-session" data-budget-session hidden>
                     <div class="budget-session-copy">
-                        <span data-budget-session-status>Presupuesto en curso</span>
-                        <strong data-budget-session-detail>Preparando tus archivos</strong>
+                        <span data-budget-session-status>Configurando presupuesto</span>
+                        <strong data-budget-session-detail>Elegí un tipo de trabajo</strong>
                     </div>
                     <button type="button" data-budget-session-action>Salir</button>
                 </div>
 
-                <label class="budget-upload" for="budget-pdf" data-budget-upload>
-                    <span>Cargar PDFs</span>
-                    <strong data-budget-file-name>Seleccioná o arrastrá tus archivos</strong>
-                    <small>Podés sumar varios PDFs sin borrar los anteriores.</small>
-                    <input id="budget-pdf" type="file" accept="application/pdf" multiple data-budget-file>
-                </label>
-                <ul class="budget-document-list" data-budget-document-list aria-label="PDFs cargados"></ul>
+                <section class="budget-overview" data-budget-overview aria-live="polite">
+                    <div data-budget-overview-content></div>
+                </section>
 
-                <p class="budget-helper">Cada PDF se cotiza como un trabajo independiente: elegí color, caras, copias y anillado desde su tarjeta.</p>
+                <div class="budget-editor" data-budget-editor>
+                    <div class="budget-tool-switch" role="tablist" aria-label="Tipo de trabajo">
+                        <button id="budget-tab-pdf" type="button" role="tab" aria-selected="true" aria-controls="budget-panel-pdf" data-budget-tool="pdf">PDFs <span data-budget-tool-pdf-count>0</span></button>
+                        <button id="budget-tab-photo" type="button" role="tab" aria-selected="false" aria-controls="budget-panel-photo" data-budget-tool="photo">Fotos <span data-budget-tool-photo-count>0</span></button>
+                        <button id="budget-tab-sticker" type="button" role="tab" aria-selected="false" aria-controls="budget-panel-sticker" data-budget-tool="sticker">Stickers <span data-budget-tool-sticker-count>0</span></button>
+                    </div>
 
-                <div class="budget-summary" aria-live="polite">
+                    <section class="budget-tool-panel" id="budget-panel-pdf" role="tabpanel" aria-labelledby="budget-tab-pdf" data-budget-tool-panel="pdf">
+                        <label class="budget-upload" for="budget-pdf" data-budget-upload>
+                            <span>Cargar PDFs</span>
+                            <strong data-budget-file-name>Seleccioná o arrastrá tus archivos</strong>
+                            <small>Podés sumar varios PDFs sin borrar los anteriores.</small>
+                            <input id="budget-pdf" type="file" accept="application/pdf" multiple data-budget-file>
+                        </label>
+                        <ul class="budget-document-list" data-budget-document-list aria-label="PDFs cargados"></ul>
+                        <p class="budget-helper">Cada PDF mantiene su propia configuración de color, caras, copias y anillado.</p>
+                    </section>
+
+                    <section class="budget-tool-panel" id="budget-panel-photo" role="tabpanel" aria-labelledby="budget-tab-photo" data-budget-tool-panel="photo" hidden>
+                        <div class="budget-tool-heading">
+                            <span>Fotografías</span>
+                            <strong>Elegí tamaño y cantidad</strong>
+                            <p>Calculamos cuántas fotos entran por A4, las hojas necesarias y el precio por unidad.</p>
+                        </div>
+                        <div class="budget-fields budget-size-fields">
+                            <div class="budget-range-control" data-budget-photo-range>
+                                <div class="budget-range-heading">
+                                    <span>Tamaño cuadrado</span>
+                                    <output data-budget-photo-size-output>5 × 5 cm</output>
+                                </div>
+                                <input type="range" min="0" max="9" step="1" value="0" aria-label="Tamaño de las fotografías" data-budget-photo-size>
+                                <div class="budget-range-scale budget-range-scale-dense" aria-hidden="true">
+                                    <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+                                    <span>10</span><span>11</span><span>12</span><span>15</span><span>A4</span>
+                                </div>
+                                <div class="budget-range-prices">
+                                    <span>5–9 cm <strong>$500 c/u</strong></span>
+                                    <span>10–12 cm <strong>$1.000 c/u</strong></span>
+                                    <span>15 cm <strong>$1.500 c/u</strong></span>
+                                    <span>A4 <strong>$2.500 c/u</strong></span>
+                                </div>
+                            </div>
+                            <label>
+                                Cantidad
+                                <input type="number" min="1" max="500" step="1" value="1" data-budget-photo-quantity>
+                            </label>
+                        </div>
+                        <div class="budget-extra-preview" data-budget-photo-preview aria-live="polite"></div>
+                        <ul class="budget-text-list" data-budget-photo-list aria-label="Fotografías cotizadas"></ul>
+                    </section>
+
+                    <section class="budget-tool-panel" id="budget-panel-sticker" role="tabpanel" aria-labelledby="budget-tab-sticker" data-budget-tool-panel="sticker" hidden>
+                        <div class="budget-tool-heading">
+                            <span>Autoadhesivos y vinilos</span>
+                            <strong>Calculá el aprovechamiento de una hoja A4</strong>
+                            <p>El subtotal depende de las planchas necesarias y del material seleccionado.</p>
+                        </div>
+                        <div class="budget-fields budget-size-fields">
+                            <div class="budget-range-control">
+                                <div class="budget-range-heading">
+                                    <span>Tamaño por lado</span>
+                                    <output data-budget-sticker-size-output>5 × 5 cm</output>
+                                </div>
+                                <input type="range" min="0" max="9" step="1" value="0" aria-label="Tamaño de los stickers" data-budget-sticker-size>
+                                <div class="budget-range-scale budget-range-scale-dense" aria-hidden="true">
+                                    <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+                                    <span>10</span><span>11</span><span>12</span><span>15</span><span>A4</span>
+                                </div>
+                            </div>
+                            <div class="budget-sticker-options">
+                                <label>
+                                    Material
+                                    <select data-budget-sticker-material>
+                                        <option value="mate">Papel mate - $2.500</option>
+                                        <option value="brillante">Papel brillante - $3.000</option>
+                                        <option value="transparente">Papel transparente - $3.500</option>
+                                        <option value="holografico">Papel holográfico - $4.000</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Cantidad deseada
+                                    <input type="number" min="1" max="5000" step="1" value="24" data-budget-sticker-quantity>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="budget-extra-preview" data-budget-sticker-preview aria-live="polite"></div>
+                        <button class="button budget-add-button" type="button" data-budget-add-sticker>Agregar stickers</button>
+                        <ul class="budget-text-list" data-budget-sticker-list aria-label="Stickers cotizados"></ul>
+                    </section>
+                </div>
+
+                <section class="budget-running" data-budget-running hidden aria-live="polite">
+                    <div class="budget-running-heading">
+                        <span>Presupuesto acumulado</span>
+                        <strong>Todos los trabajos en un solo total</strong>
+                    </div>
+                    <ul class="budget-running-list" data-budget-running-list></ul>
+                </section>
+
+                <div class="budget-summary" data-budget-summary aria-live="polite">
+                    <div>
+                        <span>Trabajos</span>
+                        <strong data-budget-items>0</strong>
+                    </div>
                     <div>
                         <span>PDFs</span>
                         <strong data-budget-documents>0</strong>
                     </div>
                     <div>
-                        <span>Páginas</span>
-                        <strong data-budget-pages>0</strong>
+                        <span>Fotos</span>
+                        <strong data-budget-photos>0</strong>
                     </div>
                     <div>
-                        <span>Hojas aprox.</span>
-                        <strong data-budget-sheets>0</strong>
+                        <span>Stickers</span>
+                        <strong data-budget-stickers>0</strong>
                     </div>
                     <div>
-                        <span>Anillado</span>
-                        <strong data-budget-binding-total>$0</strong>
-                    </div>
-                    <div>
-                        <span>Presupuesto final</span>
+                        <span>Total del presupuesto</span>
                         <strong data-budget-total>$0</strong>
+                        <small data-budget-total-note></small>
                     </div>
                 </div>
 
                 <div class="budget-delivery" data-budget-delivery>
                     <div class="budget-delivery-copy">
-                        <span>Entrega segura</span>
-                        <strong>Pedido privado para WhatsApp</strong>
-                        <p>Los PDFs se guardarán temporalmente para que la imprenta pueda descargarlos desde el mensaje.</p>
+                        <span data-budget-delivery-kicker>Entrega segura</span>
+                        <strong data-budget-delivery-title>Pedido privado para WhatsApp</strong>
+                        <p data-budget-delivery-description>Los PDFs se guardarán temporalmente para que la imprenta pueda descargarlos desde el mensaje.</p>
                     </div>
-                    <label class="budget-consent">
+                    <label class="budget-consent" data-budget-consent-box>
                         <input type="checkbox" data-budget-consent>
                         <span>Acepto la carga temporal de estos archivos. Se eliminarán automáticamente después de 7 días.</span>
                     </label>
@@ -292,9 +346,9 @@
                     </div>
                 </div>
 
-                <p class="budget-note" data-budget-status>Subí uno o más PDFs para detectar páginas y calcular el presupuesto.</p>
+                <p class="budget-note" data-budget-status>Elegí PDFs, fotografías o stickers para comenzar.</p>
                 <button class="button button-primary button-budget budget-submit" type="button" data-budget-whatsapp>
-                    Cargar primer PDF
+                    Agregá un trabajo para continuar
                 </button>
             </form>
         </section>
