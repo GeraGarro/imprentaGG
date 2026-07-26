@@ -1,0 +1,12 @@
+# Local development tooling
+.tools/
+.agents/
+.codex/
+
+# Temporary preview and log files
+.codex-*
+*.log
+
+# OS metadata
+.DS_Store
+Thumbs.db
