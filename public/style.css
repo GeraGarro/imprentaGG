@@ -265,7 +265,7 @@ body.is-screen-jumping {
     0 0 42px rgba(13, 114, 217, 0.24);
   opacity: 0;
   transform: translateY(18px) scale(0.86) rotate(-2deg);
-  animation: home-intro-logo 0.78s cubic-bezier(0.22, 1, 0.36, 1) 5.35s both;
+  animation: home-intro-logo 0.42s cubic-bezier(0.22, 1, 0.36, 1) 4.92s both;
 }
 
 .home-intro-logo img {

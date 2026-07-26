@@ -261,7 +261,7 @@ function initHomeIntro() {
     return;
   }
 
-  const introDuration = compactIntroQuery.matches ? 2350 : 6650;
+  const introDuration = compactIntroQuery.matches ? 2350 : 5950;
   window.setTimeout(completeHomeIntro, prefersReducedMotion ? 500 : introDuration);
 }
 
