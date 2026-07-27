@@ -3744,6 +3744,10 @@ body.is-budget-focused {
   overflow: hidden;
 }
 
+body.is-budget-focused main > [data-screen]:not(.budget-section) {
+  visibility: hidden;
+}
+
 body.is-budget-focused .site-header {
   opacity: 0;
   pointer-events: none;
@@ -3762,13 +3766,19 @@ body.is-budget-focused .site-header {
   grid-template-columns: minmax(230px, 0.58fr) minmax(0, 1.42fr);
   align-items: start;
   overflow: hidden;
+  opacity: 1 !important;
+  visibility: visible;
+  transform: none !important;
+  filter: none !important;
   border: 0;
   border-radius: 0;
+  background-color: var(--page-bg);
   background:
     linear-gradient(115deg, var(--page-soft) 0%, transparent 34%),
     linear-gradient(252deg, var(--page-warm) 0%, transparent 42%),
     var(--page-bg);
   box-shadow: none;
+  isolation: isolate;
 }
 
 .budget-section.is-budget-focused .contact-copy {

@@ -922,6 +922,7 @@ function updateBudgetSessionUI() {
 
 function setBudgetFocus(active, options = {}) {
   const nextState = Boolean(active);
+  const focusScrollTop = nextState && budgetSection ? budgetSection.offsetTop : null;
   if (nextState === isBudgetFocused) {
     updateBudgetSessionUI();
     return;
@@ -936,6 +937,12 @@ function setBudgetFocus(active, options = {}) {
   });
 
   if (isBudgetFocused) {
+    isScreenJumping = false;
+    document.documentElement.classList.remove("is-screen-jumping");
+    document.body.classList.remove("is-screen-jumping");
+    document.body.style.removeProperty("--screen-direction");
+    clearScreenTransitionClasses();
+    if (Number.isFinite(focusScrollTop)) window.scrollTo(0, focusScrollTop);
     budgetSection?.scrollTo({ top: 0, behavior: "auto" });
     budgetForm?.scrollTo({ top: 0, behavior: "auto" });
     if (options.focusSession) window.requestAnimationFrame(() => budgetSessionAction?.focus());
@@ -2278,6 +2285,8 @@ function animateScreenScroll(targetTop, duration = 760) {
   const startTime = window.performance.now();
 
   function step(now) {
+    if (!isScreenJumping) return;
+
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
 
