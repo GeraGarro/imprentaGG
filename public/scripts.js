@@ -79,7 +79,10 @@ const galleryTabs = document.querySelector("[data-gallery-tabs]");
 const workGallery = document.querySelector("[data-work-gallery]");
 const workGallerySection = document.querySelector(".work-gallery-section");
 const rouletteTrack = document.querySelector("[data-roulette-track]");
+const rouletteScene = rouletteTrack?.closest(".roulette-scene");
 const rouletteControls = document.querySelector("[data-roulette-controls]");
+const roulettePrevious = document.querySelector("[data-roulette-previous]");
+const rouletteNext = document.querySelector("[data-roulette-next]");
 const rouletteCategory = document.querySelector("[data-roulette-category]");
 const rouletteTitle = document.querySelector("[data-roulette-title]");
 const rouletteCount = document.querySelector("[data-roulette-count]");
@@ -158,7 +161,7 @@ const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const compactIntroQuery = window.matchMedia("(max-width: 620px)");
 const transitionLayer = document.createElement("div");
 const serviceImagePreview = document.createElement("div");
-const rouletteAutoplayDelay = 2000;
+const rouletteAutoplayDelay = 4200;
 const BUDGET_PRINT_PRICES = {
   bn: 150,
   color: 200,
@@ -252,7 +255,7 @@ function completeHomeIntro() {
     document.body.classList.remove("has-home-intro");
     homeIntro.remove();
     requestScrollUpdate();
-  }, prefersReducedMotion ? 80 : exitDuration);
+  }, prefersReducedMotion ? 140 : exitDuration);
 }
 
 function initHomeIntro() {
@@ -261,8 +264,22 @@ function initHomeIntro() {
     return;
   }
 
-  const introDuration = compactIntroQuery.matches ? 2350 : 5950;
-  window.setTimeout(completeHomeIntro, prefersReducedMotion ? 500 : introDuration);
+  let hasCompleted = false;
+  const finishIntro = () => {
+    if (hasCompleted) return;
+    hasCompleted = true;
+    window.setTimeout(completeHomeIntro, 360);
+  };
+
+  const introLogo = homeIntro.querySelector(".home-intro-logo");
+  introLogo?.addEventListener("animationend", finishIntro, { once: true });
+
+  // Give the browser a painted initial state before starting the CSS animations.
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => homeIntro.classList.add("is-running"));
+  });
+
+  window.setTimeout(finishIntro, 6500);
 }
 
 function formatBudgetCurrency(value) {
@@ -1748,6 +1765,14 @@ function createGalleryCard(item, index) {
 
 let rouletteIndex = 0;
 let rouletteTimer;
+let isWorkRouletteVisible = false;
+let roulettePointerId = null;
+let rouletteDragStartX = 0;
+let rouletteDragStartY = 0;
+let rouletteDragLastX = 0;
+let rouletteDragLastTime = 0;
+let rouletteDragVelocity = 0;
+let rouletteDidDrag = false;
 
 function getRouletteMetrics() {
   const sceneBox = rouletteTrack?.closest(".roulette-scene")?.getBoundingClientRect();
@@ -1768,8 +1793,9 @@ function getRouletteMetrics() {
 }
 
 function getCircularDistance(index, active, total) {
-  let distance = (index - active + total) % total;
+  let distance = index - active;
   if (distance > total / 2) distance -= total;
+  if (distance < -total / 2) distance += total;
   return distance;
 }
 
@@ -1780,7 +1806,8 @@ function createRouletteCard(item, index) {
 
   const image = document.createElement("img");
   image.alt = item.alt;
-  image.loading = index < 8 ? "eager" : "lazy";
+  image.loading = "eager";
+  image.fetchPriority = index < 6 ? "high" : "low";
   image.decoding = "async";
   const syncRouletteImageOrientation = () => {
     card.classList.toggle("is-portrait", image.naturalHeight > image.naturalWidth * 1.08);
@@ -1805,14 +1832,15 @@ function createRouletteCard(item, index) {
   return card;
 }
 
-function updateWorkRoulette(nextIndex = rouletteIndex) {
+function updateWorkRoulette(nextIndex = rouletteIndex, options = {}) {
   if (!rouletteTrack) return;
 
   const cards = [...rouletteTrack.querySelectorAll(".roulette-card")];
   const total = cards.length;
   if (!total) return;
 
-  rouletteIndex = (nextIndex + total) % total;
+  const normalizedPosition = ((nextIndex % total) + total) % total;
+  if (!options.preview) rouletteIndex = Math.round(normalizedPosition) % total;
   const metrics = getRouletteMetrics();
   const items = workImagePaths.map(getWorkImageData);
   const activeItem = items[rouletteIndex];
@@ -1820,7 +1848,7 @@ function updateWorkRoulette(nextIndex = rouletteIndex) {
   rouletteTrack.style.transform = "translate3d(-50%, -50%, 0)";
 
   cards.forEach((card, index) => {
-    const signedDistance = getCircularDistance(index, rouletteIndex, total);
+    const signedDistance = getCircularDistance(index, normalizedPosition, total);
     const distance = Math.abs(signedDistance);
     const direction = signedDistance === 0 ? 0 : Math.sign(signedDistance);
     const clamped = Math.max(-7, Math.min(7, signedDistance));
@@ -1839,14 +1867,12 @@ function updateWorkRoulette(nextIndex = rouletteIndex) {
     card.style.transform = `translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), ${z}px) rotateY(${-rotateY}deg) rotateZ(${rotateZ}deg) scale(${scale})`;
     card.style.zIndex = String(Math.round(120 - distance * 8));
     card.style.opacity = hidden ? "0" : String(opacity);
-    card.style.filter = distance === 0
-      ? "saturate(1.08) contrast(1.03)"
-      : `saturate(${Math.max(0.58, 0.8 - distance * 0.04)}) brightness(${Math.max(0.58, 0.82 - distance * 0.045)}) contrast(0.94)`;
-    card.style.pointerEvents = distance === 0 ? "auto" : "none";
-    card.classList.toggle("is-active", distance === 0);
+    card.style.pointerEvents = hidden ? "none" : "auto";
+    card.classList.toggle("is-active", index === rouletteIndex);
+    card.setAttribute("aria-hidden", String(hidden));
   });
 
-  if (activeItem) {
+  if (!options.preview && activeItem) {
     rouletteCategory.textContent = activeItem.groupLabel;
     rouletteTitle.textContent = activeItem.kicker;
     rouletteCount.textContent = `${rouletteIndex + 1} de ${total} trabajos cargados`;
@@ -1857,6 +1883,92 @@ function updateWorkRoulette(nextIndex = rouletteIndex) {
 
 function moveWorkRoulette(direction) {
   updateWorkRoulette(rouletteIndex + direction);
+}
+
+function finishRouletteDrag(event, cancelled = false) {
+  if (roulettePointerId === null || event.pointerId !== roulettePointerId) return;
+
+  const metrics = getRouletteMetrics();
+  const deltaX = event.clientX - rouletteDragStartX;
+  const projectedDelta = deltaX + rouletteDragVelocity * 150;
+  let step = cancelled ? 0 : Math.round(-projectedDelta / Math.max(140, metrics.spread * 0.7));
+
+  if (!cancelled && step === 0 && Math.abs(deltaX) > 42) step = deltaX > 0 ? -1 : 1;
+  step = Math.max(-3, Math.min(3, step));
+
+  rouletteScene?.classList.remove("is-dragging");
+  rouletteScene?.releasePointerCapture?.(roulettePointerId);
+  roulettePointerId = null;
+
+  // Flush the drag frame so snapping uses the card transition.
+  void rouletteTrack?.offsetWidth;
+  updateWorkRoulette(rouletteIndex + step);
+  startWorkRouletteAutoplay();
+}
+
+function initWorkRouletteInteraction() {
+  if (!rouletteScene || !rouletteTrack) return;
+
+  rouletteScene.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || roulettePointerId !== null) return;
+
+    roulettePointerId = event.pointerId;
+    rouletteDragStartX = event.clientX;
+    rouletteDragStartY = event.clientY;
+    rouletteDragLastX = event.clientX;
+    rouletteDragLastTime = event.timeStamp;
+    rouletteDragVelocity = 0;
+    rouletteDidDrag = false;
+    rouletteScene.setPointerCapture(event.pointerId);
+    stopWorkRouletteAutoplay();
+  });
+
+  rouletteScene.addEventListener("pointermove", (event) => {
+    if (event.pointerId !== roulettePointerId) return;
+
+    const deltaX = event.clientX - rouletteDragStartX;
+    const deltaY = event.clientY - rouletteDragStartY;
+    if (!rouletteDidDrag && Math.abs(deltaX) < 8) return;
+    if (!rouletteDidDrag && Math.abs(deltaY) > Math.abs(deltaX)) return;
+
+    rouletteDidDrag = true;
+    event.preventDefault();
+    rouletteScene.classList.add("is-dragging");
+
+    const elapsed = Math.max(1, event.timeStamp - rouletteDragLastTime);
+    rouletteDragVelocity = (event.clientX - rouletteDragLastX) / elapsed;
+    rouletteDragLastX = event.clientX;
+    rouletteDragLastTime = event.timeStamp;
+
+    const metrics = getRouletteMetrics();
+    const dragPosition = rouletteIndex - deltaX / Math.max(170, metrics.spread * 0.82);
+    updateWorkRoulette(dragPosition, { preview: true });
+  }, { passive: false });
+
+  rouletteScene.addEventListener("pointerup", (event) => finishRouletteDrag(event));
+  rouletteScene.addEventListener("pointercancel", (event) => finishRouletteDrag(event, true));
+  rouletteScene.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    moveWorkRoulette(event.key === "ArrowLeft" ? -1 : 1);
+    startWorkRouletteAutoplay();
+  });
+
+  rouletteScene.addEventListener("pointerenter", stopWorkRouletteAutoplay);
+  rouletteScene.addEventListener("pointerleave", () => {
+    if (roulettePointerId === null) startWorkRouletteAutoplay();
+  });
+  rouletteScene.addEventListener("focusin", stopWorkRouletteAutoplay);
+  rouletteScene.addEventListener("focusout", startWorkRouletteAutoplay);
+
+  roulettePrevious?.addEventListener("click", () => {
+    moveWorkRoulette(-1);
+    startWorkRouletteAutoplay();
+  });
+  rouletteNext?.addEventListener("click", () => {
+    moveWorkRoulette(1);
+    startWorkRouletteAutoplay();
+  });
 }
 
 function stopWorkRouletteAutoplay() {
@@ -1875,7 +1987,7 @@ function updateRouletteCategoryControls(activeGroup) {
 
 function startWorkRouletteAutoplay() {
   stopWorkRouletteAutoplay();
-  if (prefersReducedMotion || !rouletteTrack) return;
+  if (prefersReducedMotion || !rouletteTrack || !isWorkRouletteVisible) return;
   rouletteTimer = window.setInterval(() => moveWorkRoulette(1), rouletteAutoplayDelay);
 }
 
@@ -1891,13 +2003,11 @@ function renderWorkRoulette() {
   items.forEach((item, index) => rouletteTrack.append(createRouletteCard(item, index)));
 
   rouletteTrack.querySelectorAll(".roulette-card").forEach((card) => {
-    card.addEventListener("pointerenter", () => {
-      if (!card.classList.contains("is-active")) return;
-      stopWorkRouletteAutoplay();
-    });
-
-    card.addEventListener("pointerleave", () => {
-      if (!card.classList.contains("is-active")) return;
+    card.addEventListener("click", () => {
+      if (rouletteDidDrag) return;
+      const targetIndex = Number(card.dataset.rouletteIndex);
+      if (!Number.isFinite(targetIndex) || targetIndex === rouletteIndex) return;
+      updateWorkRoulette(targetIndex);
       startWorkRouletteAutoplay();
     });
   });
@@ -1916,7 +2026,18 @@ function renderWorkRoulette() {
 
   window.addEventListener("resize", () => updateWorkRoulette());
 
+  const rouletteObserver = new IntersectionObserver(([entry]) => {
+    isWorkRouletteVisible = entry.isIntersecting;
+    if (isWorkRouletteVisible) {
+      startWorkRouletteAutoplay();
+    } else {
+      stopWorkRouletteAutoplay();
+    }
+  }, { threshold: 0.24 });
+  rouletteObserver.observe(rouletteScene || rouletteTrack);
+
   updateWorkRoulette(0);
+  initWorkRouletteInteraction();
   startWorkRouletteAutoplay();
 }
 
@@ -2151,7 +2272,7 @@ function finishScreenJump(targetTop) {
   requestScrollUpdate();
 }
 
-function animateScreenScroll(targetTop, duration = 940) {
+function animateScreenScroll(targetTop, duration = 760) {
   const startTop = window.scrollY;
   const distance = targetTop - startTop;
   const startTime = window.performance.now();

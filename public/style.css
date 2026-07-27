@@ -303,12 +303,7 @@ main > [data-screen] {
   min-height: 100svh;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  transform-origin: center;
-  transition:
-    opacity 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, filter, transform;
+  transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 main > [data-screen].is-screen-active {
@@ -316,14 +311,15 @@ main > [data-screen].is-screen-active {
 }
 
 main > [data-screen].is-screen-exiting {
-  opacity: 0.52;
-  filter: blur(10px) saturate(0.82);
-  transform: translate3d(0, calc(var(--screen-direction, 1) * -28px), 0) scale(0.982);
+  opacity: 0.78;
 }
 
 main > [data-screen].is-screen-entering {
-  filter: saturate(1.08) contrast(1.02);
-  transform: translate3d(0, calc(var(--screen-direction, 1) * 18px), 0) scale(1.012);
+  opacity: 1;
+}
+
+body.is-screen-jumping main > [data-screen].is-screen-exiting {
+  will-change: opacity;
 }
 
 .screen-transition-layer {
@@ -357,7 +353,6 @@ main > [data-screen].is-screen-entering {
   background:
     linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent),
     linear-gradient(135deg, var(--wash-blue), var(--wash-green));
-  filter: blur(1px);
 }
 
 body.is-screen-jumping .screen-transition-layer {
@@ -365,11 +360,11 @@ body.is-screen-jumping .screen-transition-layer {
 }
 
 body.is-screen-jumping .screen-transition-layer::before {
-  animation: screen-wash 0.94s cubic-bezier(0.76, 0, 0.24, 1) both;
+  animation: screen-wash 0.72s cubic-bezier(0.76, 0, 0.24, 1) both;
 }
 
 body.is-screen-jumping .screen-transition-layer::after {
-  animation: screen-wash 0.94s cubic-bezier(0.76, 0, 0.24, 1) 0.08s both;
+  animation: screen-wash 0.7s cubic-bezier(0.76, 0, 0.24, 1) 0.04s both;
 }
 
 @keyframes screen-wash {
@@ -1668,7 +1663,10 @@ h3 {
   position: relative;
   min-height: clamp(640px, 84vh, 900px);
   overflow: hidden;
-  cursor: default;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  contain: layout paint;
   background:
     linear-gradient(90deg, rgba(var(--surface-rgb), 0.18), transparent 14% 86%, rgba(var(--surface-rgb), 0.18)),
     radial-gradient(ellipse at 50% 46%, rgba(255, 255, 255, 0.22), transparent 34%),
@@ -1680,6 +1678,15 @@ h3 {
     --roulette-bg-b 1.35s ease,
     --roulette-bg-c 1.35s ease,
     --roulette-glow 1.35s ease;
+}
+
+.roulette-scene:focus-visible {
+  outline: 3px solid rgba(13, 114, 217, 0.72);
+  outline-offset: -5px;
+}
+
+.roulette-scene.is-dragging {
+  cursor: grabbing;
 }
 
 .roulette-scene::before {
@@ -1742,16 +1749,19 @@ h3 {
     inset 0 -12px 20px rgba(0, 0, 0, 0.22);
   transform-style: preserve-3d;
   backface-visibility: hidden;
-  cursor: default;
-  will-change: transform, opacity, filter;
+  cursor: pointer;
+  will-change: transform, opacity;
   transition:
-    transform 1.55s cubic-bezier(0.18, 0.86, 0.22, 1),
-    width 0.72s ease,
-    opacity 0.72s ease,
-    filter 0.72s ease,
-    border-color 0.72s ease,
-    box-shadow 0.72s ease,
-    background-color 0.72s ease;
+    transform 0.92s cubic-bezier(0.16, 1, 0.3, 1),
+    width 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.46s ease,
+    border-color 0.46s ease,
+    box-shadow 0.46s ease,
+    background-color 0.46s ease;
+}
+
+.roulette-scene.is-dragging .roulette-card {
+  transition: none;
 }
 
 .roulette-card::before {
@@ -1819,7 +1829,6 @@ h3 {
   outline-offset: 12px;
   opacity: 1;
   background: rgba(255, 255, 255, 0.96);
-  filter: saturate(1.06) contrast(1.02);
   box-shadow:
     0 30px 70px rgba(18, 24, 33, 0.24),
     0 4px 18px rgba(18, 24, 33, 0.16),
@@ -1883,8 +1892,37 @@ h3 {
 }
 
 .roulette-meta,
+.roulette-navigation,
 .roulette-controls {
   pointer-events: auto;
+}
+
+.roulette-navigation {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.roulette-navigation button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-ink);
+  background: rgba(var(--surface-rgb), 0.9);
+  box-shadow: 0 12px 26px rgba(18, 24, 33, 0.12);
+  font-size: 2rem;
+  line-height: 1;
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.roulette-navigation button:hover,
+.roulette-navigation button:focus-visible {
+  border-color: rgba(13, 114, 217, 0.62);
+  background: rgb(var(--surface-rgb));
+  transform: translateY(-2px);
 }
 
 .roulette-meta span {
@@ -3913,13 +3951,19 @@ main > [data-screen].is-screen-active [data-reveal] {
     transition-duration: 0.12s !important;
   }
 
-  .home-intro-line,
+  .home-intro-line-primary {
+    animation-duration: 2.15s, 0.68s !important;
+    animation-delay: 0.28s, 0.28s !important;
+  }
+
+  .home-intro-line-secondary {
+    animation-duration: 2.45s, 0.68s !important;
+    animation-delay: 2.45s, 2.45s !important;
+  }
+
   .home-intro-logo {
-    width: auto;
-    opacity: 1;
-    border-right: 0;
-    transform: none;
-    animation: none !important;
+    animation-duration: 0.42s !important;
+    animation-delay: 4.92s !important;
   }
 
 }
@@ -4436,6 +4480,10 @@ main > [data-screen].is-screen-active [data-reveal] {
     padding: 18px;
   }
 
+  .roulette-navigation {
+    margin: 18px 0 0;
+  }
+
   .roulette-controls {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4880,4 +4928,14 @@ main > [data-screen].is-screen-active [data-reveal] {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.home-intro-line,
+.home-intro-logo {
+  animation-play-state: paused;
+}
+
+.home-intro.is-running .home-intro-line,
+.home-intro.is-running .home-intro-logo {
+  animation-play-state: running;
 }

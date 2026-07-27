@@ -90,7 +90,7 @@ const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const compactIntroQuery = window.matchMedia("(max-width: 620px)");
 const transitionLayer = document.createElement("div");
 const serviceImagePreview = document.createElement("div");
-const rouletteAutoplayDelay = home-intro-write;
+const rouletteAutoplayDelay = 2000;
 
 let ticking = false;
 let isScreenJumping = false;
